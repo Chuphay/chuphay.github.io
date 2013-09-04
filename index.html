@@ -1,51 +1,420 @@
 <!DOCTYPE html>
 <html>
+<head>
+<title>three D code</title>
+<!-- here's some crazy shader stuff -->
+<script id="shader-fs" type="x-shader/x-fragment">
+    //from http://learningwebgl.com/blog/?p=134
+    precision mediump float;
+    varying vec4 vColor;
+    void main(void) {
+        gl_FragColor = vColor;
+    }
+</script>
+<script id="shader-vs" type="x-shader/x-vertex">
+    //from http://learningwebgl.com/blog/?p=134
+    attribute vec3 aVertexPosition;
+    attribute vec4 aVertexColor;
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    varying vec4 vColor;
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vColor = aVertexColor;
+    }
+</script>
+</head>
+  
+<body>
+  <h1>Make Your Own 3d World</h1>
+ <!--Had to make a table here, pretty wierd, but it works-->
+  <table id="button_wrapper">
+    <tr><td colspan="2">
+<canvas id="canvas" style="border: none; background-color: grey;" width="500" height="500"></canvas>
+      </td></tr>
+      <tr>
+        <td><button onclick="run()"> play </button></td>
+        <td><button onclick="stop()"> stop </button></td>
+  </table>
+<!-- here's the text area that contains the javascript for what we are actually rendering. If you are using codeacademy, for some reason it doesn't work, and you will have to manually copy the code and paste into the textarea... pretty annoying -->
+<textarea id="console" cols="60" rows="30">
+//If you want to jump right into making your own 3D world
+//just skip down to the bottom and start messing around
+//I will however comment this code fairly heavily
+//to help everyone understand
+//
+//alright, 3D graphics is all about triangles
+//so that's where we start
+//this triangle function will construct new triangles
+//take a look at it
+ 
+function triangle(vertices,r,g,b){
+    this.vertices = function(){
+        return [vertices];
+    };
+    this.colors = function(){   
+        return [[r,g,b,1,r,g,b,1,r,g,b,0.1]];
+    };
+    this.render = function(){
+        glRender(this.vertices(),this.colors());
+    };
+}
+//every triangle has three vertices, 
+//and each vertex has three coordinates x,y and z
+//thus, the triangle will need 9 coordinates all together
+//for example [0,0,-1,1,1,-1,1,-1,-1]
+//the triangle function also takes colors: red, green, blue 
+//from a value of 0 to 1
+//if you uncomment the following two lines of code
+//you should see a triangle (be sure to turn the tick function off down below)
+// 
+//var tri = new triangle([0,0,-1,1,1,-1,1,-1,-1],0,0,1);
+//tri.render();
+//
+//you will notice that the render function is calling glRender 
+//which is located in the html file
+//it's some pretty complicated webGL, and if you want to learn more
+//I'd suggest you check out the link
+//you should also notice that the colors takes a fourth value... no idea what that's about   
+//
+//following we have our basic shapes
+//all we have is a box and a pyramid for now
+//but hopefully we can all work together to make some other shapes
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Chuphay.github.io : threeDcode" />
+function box(x,y,z,height,width,depth,r,g,b){
+    this.vertices = function(){
+        return [[x,y,z,x+width,y,z,x,y+height,z],[x+width,y,z,x,y+height,z,x+width,y+height,z],[x,y,z,x+width,y,z,x,y,z+depth],[x+width,y,z,x,y,z+depth,x+width,y,z+depth],[x+width,y,z+depth,x+width,y+height,z+depth,x,y+height,z+depth],[x+width,y,z+depth,x,y,z+depth,x,y+height,z+depth],[x+width,y+height,z+depth,x,y+height,z+depth,x,y+height,z],[x+width,y+height,z+depth,x,y+height,z,x+width,y+height,z],[x+width,y+height,z+depth,x+width,y,z+depth,x+width,y+height,z],[x+width,y,z,x+width,y,z+depth,x+width,y+height,z],[x,y+height,z+depth,x,y,z+depth,x,y+height,z],[x,y,z,x,y,z+depth,x,y+height,z]];
+        //,[x,y+height,z+depth,x,y,z+depth,x,y+height,z],[x+1,y,z,x,y,z+depth,x,y+height,z]
+    };
+    this.colors = function(){
+        var colors = [];
+        for(var i = 0; i<12;i++){
+            colors.push([r,g,b,1,r,g,b,1,r,g,b,0.1]);
+        }
+        return colors;
+    };
+    this.render = function(){
+        glRender(this.vertices(),this.colors());
+    };
+}
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+function pyramid(x,y,z,height,angle,r,g,b){
+    var base = height*Math.tan(angle);
+    this.vertices = function(){
+        return [[x,y,z,x+base,y-height,z+base,x+base,y-height,z-base],[x,y,z,x-base,y-height,z+base,x-base,y-height,z-base],[x,y,z,x-base,y-height,z+base,x+base,y-height,z+base],[x,y,z,x-base,y-height,z-base,x+base,y-height,z-base]];
+    };
+    this.colors = function(){
+        var colors = [];
+        for(var i = 0; i<4;i++){
+            colors.push([r,g,b,1,r,g,b,1,r,g,b,0.1]);
+        }
+        return colors;
+    };
+    this.render = function(){
+        glRender(this.vertices(),this.colors());
+    };
+}
+//next up we have rotation and transpose
+//I hope they are fairly obvious, even though they may be a little complicated
+//the one thing to point out is that we use the add method to tell the object what to rotate
+//continuing from the triangle example:
+//var rot = new rotation(Math.PI/6,0,0);
+//rot.add(tri);
+//rot.render();
 
-    <title>Chuphay.github.io</title>
-  </head>
 
-  <body>
+function rotation(angleX,angleY,angleZ){
+    var array = [];
+    var colors = [];
+    this.add = function(obj){
+        for(var i = 0 ; i< obj.vertices().length;i++){
+            var temp = [];
+            for(var j = 0; j<8; j=j+3){
+                var x_ = (obj.vertices()[i][j]*Math.cos(angleZ)+obj.vertices()[i][j+1]*Math.sin(angleZ))*Math.cos(angleY)+obj.vertices()[i][j+2]*Math.sin(angleY);
+               var y_ =  (obj.vertices()[i][j+1]*Math.cos(angleZ)-obj.vertices()[i][j]*Math.sin(angleZ))*Math.cos(angleX)-(obj.vertices()[i][j+2]*Math.cos(angleY)-(obj.vertices()[i][j]*Math.cos(angleZ)+obj.vertices()[i][j+1]*Math.sin(angleZ))*Math.sin(angleY))*Math.sin(angleX);
+                var z_ =  Math.sin(angleX)*(obj.vertices()[i][j+1]*Math.cos(angleZ)-obj.vertices()[i][j]*Math.sin(angleZ))+Math.cos(angleX)*(obj.vertices()[i][j+2]*Math.cos(angleY)-Math.sin(angleY)*(obj.vertices()[i][j]*Math.cos(angleZ)+obj.vertices()[i][j+1]*Math.sin(angleZ)));
+                temp.push(x_,y_,z_);
+                
+            }
+        array.push(temp);    
+        colors.push(obj.colors()[i]);
+        }   
+    };
+    this.vertices = function(){
+        return array;
+    };
+    this.colors = function(){
+        return colors;
+    };
+    this.render = function(){
+        glRender(array,colors);
+    };
+}
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/Chuphay">View on GitHub</a>
+function transpose(x,y,z){
+    var array = [];
+    var colors = [];
+    this.add = function(obj){
+        for(var i = 0 ; i< obj.vertices().length;i++){
+        array.push(
+            [obj.vertices()[i][0]+x,obj.vertices()[i][1]+y,obj.vertices()[i][2]+z,
+            obj.vertices()[i][3]+x,obj.vertices()[i][4]+y,obj.vertices()[i][5]+z,
+            obj.vertices()[i][6]+x,obj.vertices()[i][7]+y,obj.vertices()[i][8]+z]
+                );
+        colors.push(obj.colors()[i]);
+        }        
+    };
+    this.vertices = function(){
+        return array;
+    };
+    this.colors = function(){
+        return colors;
+    };
+    this.render = function(){
+        glRender(array,colors);
+    };
+}
 
-          <h1 id="project_title">Chuphay.github.io</h1>
-          <h2 id="project_tagline">threeDcode</h2>
+//here's the scene function
+//this is where it all comes together  
+//you will find that you will get the best results by chaining multiple scenes together
+//for example, adding scene1 and scene2 to scene3 and then adding more stuff
+//to scene3 before adding it to scene4
+//it can get pretty cool  
 
-        </header>
-    </div>
+function scene(x,y,z,angleX,angleY,angleZ){
+    var vertices = [];
+    var colors = [];
+    this.add = function(obj){
+        var tempTrans = new transpose(x,y,z);
+        tempTrans.add(obj);
+        var tempRotate = new rotation(angleX,angleY,angleZ);
+        tempRotate.add(tempTrans);
+        for(var i = 0 ; i< obj.vertices().length;i++){
+            vertices.push(tempRotate.vertices()[i]);
+            colors.push(obj.colors()[i]);
+        }
+    };
+    this.vertices = function(){
+        
+        return vertices;
+    };
+    this.colors = function(){
+        return colors;
+    };
+    this.render = function(){
+        glRender(vertices,colors);
+    };
+}
+  
+//finally we're ready to program our scene
+//I assume this is all fairly self evident
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h2>
-<a name="hello" class="anchor" href="#hello"><span class="octicon octicon-link"></span></a>hello?</h2>
+function tree(x,z){
+    var greenBox = new box(-0.4+x,1,-0.4-z,1.3,1.8,1.8,0.5,1,0);
+    var trunk = new box(x,-1,-z,2,1,1,0.7,0.5,0.2);
+    scene1.add(greenBox);
+    scene1.add(trunk);
+}
+function sand(x,z){
+    var yellowBox = new box(x-3,-2,-z-4,0.5,18,18,1,1,0);
+    scene1.add(yellowBox);
+}
+function lake(x,z,ripples){
+    var blueBox = new box(x,-1.5,-z,0.3,4,4,0,0.1,1);
+    var ripple = new box(x,-1.4,-z+ripples,0.3,4,1/10,0,0.7,1);
+    var rotLake = new rotation(0,3/4*Math.PI,0);
+    rotLake.add(blueBox);
+    rotLake.add(ripple);
+    scene1.add(rotLake);
+}
+function bird(x,z){
+    var birdTemp = new box(x,3,-z,0.5,1,1,1,0.5,0);
+    scene1.add(birdTemp);
+}
 
-<p><strong>hello again</strong></p>
+function mountain(x,z){
+    var mountain1 = new pyramid(0,6,0,9,Math.PI/8,0.2,0.2,0.6);
+    var peak = new pyramid(0,6.1,0,2,Math.PI/8,0.7,0.8,0.8);
+    var rotMountain = new rotation(0,1/4*Math.PI,0);
+    rotMountain.add(mountain1);
+    rotMountain.add(peak);
+    var transpose1 = new transpose(x,0,z);
+    transpose1.add(rotMountain);
+    scene1.add(transpose1);
+}
+//here we get ready to animate stuff
 
-<h4>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h4>
-
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
+var ticker = 0;
+var rippleTicker = 0; 
+var animateTicker = 0;
+function tick(){
+  
+    scene1 = new scene(0,0,0,1/4*Math.PI,0,0*ticker);
+    camera = new scene(0,0,-5-animateTicker,animateTicker/3,0,0);
     
+    bird(-2*ticker+5,4);
+    tree(3,1);
+    tree(1,3);
+    tree(2,4);
+    tree(4,3);
+    sand(-4,8);
+    lake(-1,4,rippleTicker);
+    lake(3,2,rippleTicker); 
+    lake(3,6,rippleTicker);
+    mountain(0,-14);   
+    mountain(6,-12);
+    mountain(-5,-15);
+    
+    camera.add(scene1);
+    if (ticker<4*Math.PI){ticker = ticker +0.05;}
+    else{ticker = 0;}
+    if (rippleTicker<4){rippleTicker += 0.03;}
+    else{rippleTicker = 0;}
+    if(animateTicker>-3){
+        animateTicker -= 0.01;  
+    }
+    camera.render();
+    //this requests another function in the html
+    request = requestAnimFrame(function(){tick();});
+    
+}
+//and finally we call tick
+tick();
+</textarea>
+<script>
+//here we initialize the canvas and the console to write code in
+var canvas = document.getElementById("canvas");
+var gl = canvas.getContext("experimental-webgl");
+var cnsl = document.getElementById('console');
+//this obviously evaluates the code in the text editor
+//note that if you are using this in codeacademy
+//you will actually have to copy and paste the code from the html into the text editor. I do not know why
+function run() {  
+   
+    return eval(cnsl.value); 
+}
+  function stop() {  
+   
+   cancelRequestAnimFrame(request); 
+}
+var requestAnimFrame = (function(){
+    return window.requestAnimationFrame    ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame    ||
+        window.oRequestAnimationFrame      ||
+        window.msRequestAnimationFrame     ||
+        function(callback){
+            window.setTimeout(callback, 1000 / 60);
+        };
+})(); 
+ window.cancelRequestAnimFrame = ( function() {
+    return window.cancelAnimationFrame           ||
+        window.webkitCancelRequestAnimationFrame ||
+        window.mozCancelRequestAnimationFrame    ||
+        window.oCancelRequestAnimationFrame      ||
+        window.msCancelRequestAnimationFrame     ||
+        clearTimeout
+} )();  
+//this a whole bunch of webGL stuff
+//from http://learningwebgl.com/blog/?p=134
+//apparently you don't need the next line of code?
+/*
+// glMatrix v0.9.5
+glMatrixArrayType = typeof Float32Array != "undefined" ? Float32Array : typeof WebGLFloatArray != "undefined" ? WebGLFloatArray : Array;
+ */
+function getShader(gl, id) {var shaderScript = document.getElementById(id);if (!shaderScript) {return null;}var str = "";var k = shaderScript.firstChild;while (k) {if (k.nodeType == 3) {str += k.textContent;}k = k.nextSibling;}var shader;if (shaderScript.type == "x-shader/x-fragment") {shader = gl.createShader(gl.FRAGMENT_SHADER);} else if (shaderScript.type == "x-shader/x-vertex") {shader = gl.createShader(gl.VERTEX_SHADER);} else {return null;}gl.shaderSource(shader, str);gl.compileShader(shader);if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {alert(gl.getShaderInfoLog(shader));return null;}return shader;}
+var shaderProgram;
+function initShaders() {var fragmentShader = getShader(gl, "shader-fs");var vertexShader = getShader(gl, "shader-vs");shaderProgram = gl.createProgram();gl.attachShader(shaderProgram, vertexShader);gl.attachShader(shaderProgram, fragmentShader);gl.linkProgram(shaderProgram);if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {alert("Could not initialise shaders");}gl.useProgram(shaderProgram);shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute);shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");}
+//this is the glRender function that is called from the scene constructor
+//it's not extraordinarily hard to understand
+//so if you have time, you can work through it
+function glRender(vertices,colors){
+        //from http://learningwebgl.com/blog/?p=134
+        //from : http://www.rozengain.com/blog/2010/02/22/beginning-webgl-step-by-step-tutorial/
+        //gl.viewportWidth = canvas.width;
+        //gl.viewportHeight = canvas.height;
+        //gl.viewport(0, 0, canvas.width, canvas.height);
+        //gl.clearDepth(1.0);
+        //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        // glFrustum() is not included in the WebGL API. That's why we have to do it manually here.
+        // More info: http://www.cs.utk.edu/~vose/c-stuff/opengl/glFrustum.html
+        //the pMatrix is to set up perspective
+        //I've no idea what the mvMatrix is for
+        var pMatrix = [];
+        var mvMatrix = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
+        function perspective(a,b,c,d,e){
+            a=c*Math.tan(a*Math.PI/360);b=a*b;return frustum(-b,b,-a,a,c,d,e);
+        }
+        function frustum(a,b,c,d,e,g,f){
+            var h=b-a,i=d-c,j=g-e;f[0]=e*2/h;f[1]=0;f[2]=0;f[3]=0;f[4]=0;f[5]=e*2/i;f[6]=0;f[7]=0;f[8]=(b+a)/h;f[9]=(d+c)/i;f[10]=-(g+e)/j;f[11]=-1;f[12]=0;f[13]=0;f[14]=-(g*e*2)/j;f[15]=0;return f;}
+        perspective(100, canvas.height/canvas.width, 0.1, 400.0, pMatrix);
+        
+        //In the javascript code, if you remember, we were using matrices
+        //webGL doesnt use matrices, it just takes a single array of vertices
+        //so we have to unpack the matrices that we send it
+        var glVertices = [];
+        var glColors = [];
+        for (var k= 0;k<vertices.length;k++){
+            for(var m= 0;m<9;m++){
+                glVertices.push(vertices[k][m]);
+            }
+            for(var n = 0 ; n < 12; n++){
+                glColors.push(colors[k][n]);   
+            }
+        }
+        //here's some crazy code that actually talks directly to your graphics processor (I think)
+        triangleVertex = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,triangleVertex);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(glVertices), gl.STATIC_DRAW);
+        colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(glColors), gl.STATIC_DRAW);
+        //this calls the shader program
+        initShaders();
+        //here's some clearing of the buffers 
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        //the following function is the WHOLE reason why we use webGL
+        //I would spend a little time learning about z- buffering. If you can figure out a better way to do it, you will probably become rich and famous :D
+        //http://en.wikipedia.org/wiki/Z-buffering
+        gl.enable(gl.DEPTH_TEST);   
+        gl.depthFunc(gl.LESS);
+        //this allows us to make stuff transparent
+        //just turn blend into true, and everything will be transparent
+        var blend = false;
+        if(blend){
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+            gl.enable(gl.BLEND);
+            gl.disable(gl.DEPTH_TEST);
+        }
+        //here we bind to the buffer again??   
+        gl.bindBuffer(gl.ARRAY_BUFFER,triangleVertex);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, 4, gl.FLOAT, false, 0, 0);
+        //here we send the pMatrix and the mvMAtrix over to he shaders
+        gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+        gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+        //finally we draw
+        gl.drawArrays(gl.TRIANGLES, 0, glVertices.length/3);
+        //we don't need the next line, but I think of it as another way to clear the buffer data
+        gl.flush();
+}
+</script>
+ <div>
+  <p>On the right is the code to animate this world</P>
+   <p>Try your hand at making your own world</P>
+  <p>Or room, or spaceship, or whatever</P>
 
-  </body>
+    <li><a href="http://learningwebgl.com/blog/?p=28"> Learn webGL</a></li>
+    <li><a href="http://jsbin.com/OLozuKA/18">Save your code</a></li>
+    <li><a href="http://jsbin.com/ixeV/1">View what others have created</a></li>
+    <li><a href="http://jsbin.com/OLozuKA/18">Load tools (for example, spheres, cylinders,curves, lighting, transparency, fractals...)</a></li>
+    <li><a href="http://jsbin.com/OLozuKA/18">Other cool stuff?</a></li>
+    <p>You can contact me on Skype if you're not coming from Codecademy: chuphay</P>
+</div>
+</body>
+
 </html>
+ 
