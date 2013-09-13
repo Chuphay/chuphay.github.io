@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>three D code</title>
-<!-- here's   some crazy shader stuff -->
+<!-- here's some crazy shader stuff needed for the webGl-->
 <script id="shader-fs" type="x-shader/x-fragment">
     //from http://learningwebgl.com/blog/?p=134
     precision mediump float;
@@ -24,29 +24,621 @@
     }
 </script>
 </head>
-  
 <body>
-  <h1>Make Your Own Gay 3d World</h1>
+  
+  <div id="statusBar">
+    <!--here's the html for all the user and database stuff. you can find the javascript in the javascript section -->
+    <script src="http://www.parsecdn.com/js/parse-1.1.15.min.js"></script>
+    <table>
+      <td>
+        <div id="status"></div> 
+  <button onclick = save()>save your world</button>
+      </td>
+      <td>
+  
+  
+  <form name="login">
+    <td>
+World_Name<input type="text" name="userid"/>
+
+Password<input type="password" name="pswrd"/> 
+    </td><td>
+ <input type="button" onclick="signup(this.form)" value="start a new world"/>
+<input type="button" onclick="loging(this.form)" value="Load a world"/>
+    </td>
+
+<!--<input type="reset" value="Cancel"/>-->
+</form>
+      </td>
+      <td>
+         <div>
+  <p>On the right is the code to make this world.Try your hand at making your own world.Or room, or spaceship, or whatever</P>
+  </td><td>
+    <li><a href="http://learningwebgl.com/blog/?p=28"> Learn webGL</a></li>
+    <li><a href="http://www.codecademy.com/">learn javascript</a></li>
+    <li><a href="http://jsbin.com/OLozuKA/18">View what others have created</a></li>
+    <li><a href="http://jsbin.com/OLozuKA/18">Load tools (for example, spheres, cylinders,curves, lighting, transparency, fractals...)</a></li>
+    
+</div>
+      </td>
+    </table>
+    <script>
+//this is all the database stuff
+//I learned it here on codecademy
+//http://www.codecademy.com/tracks/parse
+//I imagine it would be extremely simple to hack
+//since I have my codes all in the air
+//but I guess that's just the way it is
+
+function save(){
+  
+ Parse.initialize("pp3bsoOMSes3dtCQK2L6GO6Y1VH9FJDVwDz2nNLD","vArgfc0Ip0e5lRnS0VpgAWsLG1mtKagM50K8f9H9");
+        var currentUser = Parse.User.current();
+  if (currentUser) {
+      var code = document.getElementById("code");
+  document.getElementById("status").innerHTML = "please wait...";
+  var userName = currentUser.getUsername();
+        currentUser.set("code",code.value);
+        currentUser.save(null, {
+            success: function(object) { document.getElementById("status").innerHTML = "you are making the 3D world: "+userName+". ";
+            },
+          error: function() { document.getElementById("status").innerHTML = "oops... try again";}});
+  }else{
+  document.getElementById("status").innerHTML = "you have to either start a new world or load a world to save";}}
+
+function loging(form){
+        document.getElementById("status").innerHTML = "Please wait...";
+   Parse.initialize("pp3bsoOMSes3dtCQK2L6GO6Y1VH9FJDVwDz2nNLD","vArgfc0Ip0e5lRnS0VpgAWsLG1mtKagM50K8f9H9");
+        Parse.User.logOut();
+       
+        Parse.User.logIn(form.userid.value, form.pswrd.value, {
+            success: function(user) {
+    var currentUser = Parse.User.current();
+      var userName = currentUser.getUsername();
+       var newtext = currentUser.get("code");
+                document.getElementById("code").value = newtext;
+         var myCodeMirror = CodeMirror.fromTextArea(code,{
+      lineNumbers:true,
+      lineWrapping:true
+    });                    document.getElementById("status").innerHTML = "you are making the 3D world: "+userName+". ";
+            },
+           error: function() { document.getElementById("status").innerHTML = "oops... try again";}});}
+
+function signup(form){
+Parse.initialize("pp3bsoOMSes3dtCQK2L6GO6Y1VH9FJDVwDz2nNLD","vArgfc0Ip0e5lRnS0VpgAWsLG1mtKagM50K8f9H9");
+       
+        document.getElementById("status").innerHTML = "Please wait...";
+        var user = new Parse.User();
+        user.set("username",form.userid.value);
+        user.set("password",form.pswrd.value);
+  var code = document.getElementById("code");
+  user.set("code",code.value);
+        user.signUp(null, {
+            success: function(user) {
+                var currentUser = Parse.User.current();              
+               var userName = currentUser.getUsername(); document.getElementById("status").innerHTML = "you are making the 3D world: "+userName+". ";
+            },
+          error: function(){
+          document.getElementById("status").innerHTML = "oops... try again. Every world name must be unique, your choice may have already been taken";
+          }});}
+
+function updateStatus(){
+  document.getElementById("status").innerHTML = "please wait...";
+window.onload = function(){ Parse.initialize("pp3bsoOMSes3dtCQK2L6GO6Y1VH9FJDVwDz2nNLD","vArgfc0Ip0e5lRnS0VpgAWsLG1mtKagM50K8f9H9");
+    var currentUser = Parse.User.current();
+    if (currentUser) {
+        var userName = currentUser.getUsername();
+        var query = new Parse.Query(Parse.User); document.getElementById("status").innerHTML = "please wait...";
+        query.get(Parse.User("code"),{
+            success: function(object) {              document.getElementById("status").innerHTML = "you are making the 3D world: "+userName+". ";
+                var newtext = currentUser.get("code");
+                document.getElementById("code").value = newtext;
+        myCodeMirror.setValue(newtext) 
+            },
+            error:function() {
+                document.getElementById("status").innerHTML = "oops... try again";
+                var newtext = "yikes! something failed miserably";
+                document.getElementById("code").value = newtext;}}); } else {     document.getElementById("status").innerHTML = "you have to start a world to save";} };}
+updateStatus();     
+    </script>
+  </div>
+  <h3>Make Your Own 3d World</h3>
+  
  <!--Had to make a table here, pretty wierd, but it works-->
   <table id="button_wrapper">
     <tr><td colspan="2">
-<canvas id="canvas" style="border: none; background-color: grey;" width="500" height="500"></canvas>
-      </td></tr>
-      <tr>
+<canvas id="canvas" style="border: none; background-color: blue;" width="500" height="500"></canvas>
+      </td>
         <td><button onclick="run()"> play </button></td>
         <td><button onclick="stop()"> stop </button></td>
   </table>
-<!-- here's the text area that contains the javascript for what we are actually rendering. If you are using codeacademy, for some reason it doesn't work, and you will have to manually copy the code and paste into the textarea... pretty annoying -->
-<textarea id="console" cols="60" rows="30">
-//If you want to jump right into making your own 3D world
-//just skip down to the bottom and start messing around
-//I will however comment this code fairly heavily
-//to help everyone understand
-//
-//alright, 3D graphics is all about triangles
-//so that's where we start
-//this triangle function will construct new triangles
-//take a look at it
+    <script src="script.js"></script>
+  <script>
+    // TODO actually recognize syntax of TypeScript constructs
+
+CodeMirror.defineMode("javascript", function(config, parserConfig) {
+  var indentUnit = config.indentUnit;
+  var statementIndent = parserConfig.statementIndent;
+  var jsonMode = parserConfig.json;
+  var isTS = parserConfig.typescript;
+
+  // Tokenizer
+
+  var keywords = function(){
+    function kw(type) {return {type: type, style: "keyword"};}
+    var A = kw("keyword a"), B = kw("keyword b"), C = kw("keyword c");
+    var operator = kw("operator"), atom = {type: "atom", style: "atom"};
+
+    var jsKeywords = {
+      "if": kw("if"), "while": A, "with": A, "else": B, "do": B, "try": B, "finally": B,
+      "return": C, "break": C, "continue": C, "new": C, "delete": C, "throw": C,
+      "var": kw("var"), "const": kw("var"), "let": kw("var"),
+      "function": kw("function"), "catch": kw("catch"),
+      "for": kw("for"), "switch": kw("switch"), "case": kw("case"), "default": kw("default"),
+      "in": operator, "typeof": operator, "instanceof": operator,
+      "true": atom, "false": atom, "null": atom, "undefined": atom, "NaN": atom, "Infinity": atom,
+      "this": kw("this")
+    };
+
+    // Extend the 'normal' keywords with the TypeScript language extensions
+    if (isTS) {
+      var type = {type: "variable", style: "variable-3"};
+      var tsKeywords = {
+        // object-like things
+        "interface": kw("interface"),
+        "class": kw("class"),
+        "extends": kw("extends"),
+        "constructor": kw("constructor"),
+
+        // scope modifiers
+        "public": kw("public"),
+        "private": kw("private"),
+        "protected": kw("protected"),
+        "static": kw("static"),
+
+        "super": kw("super"),
+
+        // types
+        "string": type, "number": type, "bool": type, "any": type
+      };
+
+      for (var attr in tsKeywords) {
+        jsKeywords[attr] = tsKeywords[attr];
+      }
+    }
+
+    return jsKeywords;
+  }();
+
+  var isOperatorChar = /[+\-*&%=<>!?|~^]/;
+
+  function chain(stream, state, f) {
+    state.tokenize = f;
+    return f(stream, state);
+  }
+
+  function nextUntilUnescaped(stream, end) {
+    var escaped = false, next;
+    while ((next = stream.next()) != null) {
+      if (next == end && !escaped)
+        return false;
+      escaped = !escaped && next == "\\";
+    }
+    return escaped;
+  }
+
+  // Used as scratch variables to communicate multiple values without
+  // consing up tons of objects.
+  var type, content;
+  function ret(tp, style, cont) {
+    type = tp; content = cont;
+    return style;
+  }
+  function jsTokenBase(stream, state) {
+    var ch = stream.next();
+    if (ch == '"' || ch == "'")
+      return chain(stream, state, jsTokenString(ch));
+    else if (ch == "." && stream.match(/^\d+(?:[eE][+\-]?\d+)?/))
+      return ret("number", "number");
+    else if (/[\[\]{}\(\),;\:\.]/.test(ch))
+      return ret(ch);
+    else if (ch == "0" && stream.eat(/x/i)) {
+      stream.eatWhile(/[\da-f]/i);
+      return ret("number", "number");
+    }
+    else if (/\d/.test(ch)) {
+      stream.match(/^\d*(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
+      return ret("number", "number");
+    }
+    else if (ch == "/") {
+      if (stream.eat("*")) {
+        return chain(stream, state, jsTokenComment);
+      }
+      else if (stream.eat("/")) {
+        stream.skipToEnd();
+        return ret("comment", "comment");
+      }
+      else if (state.lastType == "operator" || state.lastType == "keyword c" ||
+               /^[\[{}\(,;:]$/.test(state.lastType)) {
+        nextUntilUnescaped(stream, "/");
+        stream.eatWhile(/[gimy]/); // 'y' is "sticky" option in Mozilla
+        return ret("regexp", "string-2");
+      }
+      else {
+        stream.eatWhile(isOperatorChar);
+        return ret("operator", null, stream.current());
+      }
+    }
+    else if (ch == "#") {
+      stream.skipToEnd();
+      return ret("error", "error");
+    }
+    else if (isOperatorChar.test(ch)) {
+      stream.eatWhile(isOperatorChar);
+      return ret("operator", null, stream.current());
+    }
+    else {
+      stream.eatWhile(/[\w\$_]/);
+      var word = stream.current(), known = keywords.propertyIsEnumerable(word) && keywords[word];
+      return (known && state.lastType != ".") ? ret(known.type, known.style, word) :
+                     ret("variable", "variable", word);
+    }
+  }
+
+  function jsTokenString(quote) {
+    return function(stream, state) {
+      if (!nextUntilUnescaped(stream, quote))
+        state.tokenize = jsTokenBase;
+      return ret("string", "string");
+    };
+  }
+
+  function jsTokenComment(stream, state) {
+    var maybeEnd = false, ch;
+    while (ch = stream.next()) {
+      if (ch == "/" && maybeEnd) {
+        state.tokenize = jsTokenBase;
+        break;
+      }
+      maybeEnd = (ch == "*");
+    }
+    return ret("comment", "comment");
+  }
+
+  // Parser
+
+  var atomicTypes = {"atom": true, "number": true, "variable": true, "string": true, "regexp": true, "this": true};
+
+  function JSLexical(indented, column, type, align, prev, info) {
+    this.indented = indented;
+    this.column = column;
+    this.type = type;
+    this.prev = prev;
+    this.info = info;
+    if (align != null) this.align = align;
+  }
+
+  function inScope(state, varname) {
+    for (var v = state.localVars; v; v = v.next)
+      if (v.name == varname) return true;
+  }
+
+  function parseJS(state, style, type, content, stream) {
+    var cc = state.cc;
+    // Communicate our context to the combinators.
+    // (Less wasteful than consing up a hundred closures on every call.)
+    cx.state = state; cx.stream = stream; cx.marked = null, cx.cc = cc;
+
+    if (!state.lexical.hasOwnProperty("align"))
+      state.lexical.align = true;
+
+    while(true) {
+      var combinator = cc.length ? cc.pop() : jsonMode ? expression : statement;
+      if (combinator(type, content)) {
+        while(cc.length && cc[cc.length - 1].lex)
+          cc.pop()();
+        if (cx.marked) return cx.marked;
+        if (type == "variable" && inScope(state, content)) return "variable-2";
+        return style;
+      }
+    }
+  }
+
+  // Combinator utils
+
+  var cx = {state: null, column: null, marked: null, cc: null};
+  function pass() {
+    for (var i = arguments.length - 1; i >= 0; i--) cx.cc.push(arguments[i]);
+  }
+  function cont() {
+    pass.apply(null, arguments);
+    return true;
+  }
+  function register(varname) {
+    function inList(list) {
+      for (var v = list; v; v = v.next)
+        if (v.name == varname) return true;
+      return false;
+    }
+    var state = cx.state;
+    if (state.context) {
+      cx.marked = "def";
+      if (inList(state.localVars)) return;
+      state.localVars = {name: varname, next: state.localVars};
+    } else {
+      if (inList(state.globalVars)) return;
+      state.globalVars = {name: varname, next: state.globalVars};
+    }
+  }
+
+  // Combinators
+
+  var defaultVars = {name: "this", next: {name: "arguments"}};
+  function pushcontext() {
+    cx.state.context = {prev: cx.state.context, vars: cx.state.localVars};
+    cx.state.localVars = defaultVars;
+  }
+  function popcontext() {
+    cx.state.localVars = cx.state.context.vars;
+    cx.state.context = cx.state.context.prev;
+  }
+  function pushlex(type, info) {
+    var result = function() {
+      var state = cx.state, indent = state.indented;
+      if (state.lexical.type == "stat") indent = state.lexical.indented;
+      state.lexical = new JSLexical(indent, cx.stream.column(), type, null, state.lexical, info);
+    };
+    result.lex = true;
+    return result;
+  }
+  function poplex() {
+    var state = cx.state;
+    if (state.lexical.prev) {
+      if (state.lexical.type == ")")
+        state.indented = state.lexical.indented;
+      state.lexical = state.lexical.prev;
+    }
+  }
+  poplex.lex = true;
+
+  function expect(wanted) {
+    return function(type) {
+      if (type == wanted) return cont();
+      else if (wanted == ";") return pass();
+      else return cont(arguments.callee);
+    };
+  }
+
+  function statement(type) {
+    if (type == "var") return cont(pushlex("vardef"), vardef1, expect(";"), poplex);
+    if (type == "keyword a") return cont(pushlex("form"), expression, statement, poplex);
+    if (type == "keyword b") return cont(pushlex("form"), statement, poplex);
+    if (type == "{") return cont(pushlex("}"), block, poplex);
+    if (type == ";") return cont();
+    if (type == "if") return cont(pushlex("form"), expression, statement, poplex, maybeelse);
+    if (type == "function") return cont(functiondef);
+    if (type == "for") return cont(pushlex("form"), expect("("), pushlex(")"), forspec1, expect(")"),
+                                   poplex, statement, poplex);
+    if (type == "variable") return cont(pushlex("stat"), maybelabel);
+    if (type == "switch") return cont(pushlex("form"), expression, pushlex("}", "switch"), expect("{"),
+                                      block, poplex, poplex);
+    if (type == "case") return cont(expression, expect(":"));
+    if (type == "default") return cont(expect(":"));
+    if (type == "catch") return cont(pushlex("form"), pushcontext, expect("("), funarg, expect(")"),
+                                     statement, poplex, popcontext);
+    return pass(pushlex("stat"), expression, expect(";"), poplex);
+  }
+  function expression(type) {
+    return expressionInner(type, false);
+  }
+  function expressionNoComma(type) {
+    return expressionInner(type, true);
+  }
+  function expressionInner(type, noComma) {
+    var maybeop = noComma ? maybeoperatorNoComma : maybeoperatorComma;
+    if (atomicTypes.hasOwnProperty(type)) return cont(maybeop);
+    if (type == "function") return cont(functiondef);
+    if (type == "keyword c") return cont(noComma ? maybeexpressionNoComma : maybeexpression);
+    if (type == "(") return cont(pushlex(")"), maybeexpression, expect(")"), poplex, maybeop);
+    if (type == "operator") return cont(noComma ? expressionNoComma : expression);
+    if (type == "[") return cont(pushlex("]"), commasep(expressionNoComma, "]"), poplex, maybeop);
+    if (type == "{") return cont(pushlex("}"), commasep(objprop, "}"), poplex, maybeop);
+    return cont();
+  }
+  function maybeexpression(type) {
+    if (type.match(/[;\}\)\],]/)) return pass();
+    return pass(expression);
+  }
+  function maybeexpressionNoComma(type) {
+    if (type.match(/[;\}\)\],]/)) return pass();
+    return pass(expressionNoComma);
+  }
+
+  function maybeoperatorComma(type, value) {
+    if (type == ",") return cont(expression);
+    return maybeoperatorNoComma(type, value, false);
+  }
+  function maybeoperatorNoComma(type, value, noComma) {
+    var me = noComma == false ? maybeoperatorComma : maybeoperatorNoComma;
+    var expr = noComma == false ? expression : expressionNoComma;
+    if (type == "operator") {
+      if (/\+\+|--/.test(value)) return cont(me);
+      if (value == "?") return cont(expression, expect(":"), expr);
+      return cont(expr);
+    }
+    if (type == ";") return;
+    if (type == "(") return cont(pushlex(")", "call"), commasep(expressionNoComma, ")"), poplex, me);
+    if (type == ".") return cont(property, me);
+    if (type == "[") return cont(pushlex("]"), maybeexpression, expect("]"), poplex, me);
+  }
+  function maybelabel(type) {
+    if (type == ":") return cont(poplex, statement);
+    return pass(maybeoperatorComma, expect(";"), poplex);
+  }
+  function property(type) {
+    if (type == "variable") {cx.marked = "property"; return cont();}
+  }
+  function objprop(type, value) {
+    if (type == "variable") {
+      cx.marked = "property";
+      if (value == "get" || value == "set") return cont(getterSetter);
+    } else if (type == "number" || type == "string") {
+      cx.marked = type + " property";
+    }
+    if (atomicTypes.hasOwnProperty(type)) return cont(expect(":"), expressionNoComma);
+  }
+  function getterSetter(type) {
+    if (type == ":") return cont(expression);
+    if (type != "variable") return cont(expect(":"), expression);
+    cx.marked = "property";
+    return cont(functiondef);
+  }
+  function commasep(what, end) {
+    function proceed(type) {
+      if (type == ",") {
+        var lex = cx.state.lexical;
+        if (lex.info == "call") lex.pos = (lex.pos || 0) + 1;
+        return cont(what, proceed);
+      }
+      if (type == end) return cont();
+      return cont(expect(end));
+    }
+    return function(type) {
+      if (type == end) return cont();
+      else return pass(what, proceed);
+    };
+  }
+  function block(type) {
+    if (type == "}") return cont();
+    return pass(statement, block);
+  }
+  function maybetype(type) {
+    if (type == ":") return cont(typedef);
+    return pass();
+  }
+  function typedef(type) {
+    if (type == "variable"){cx.marked = "variable-3"; return cont();}
+    return pass();
+  }
+  function vardef1(type, value) {
+    if (type == "variable") {
+      register(value);
+      return isTS ? cont(maybetype, vardef2) : cont(vardef2);
+    }
+    return pass();
+  }
+  function vardef2(type, value) {
+    if (value == "=") return cont(expressionNoComma, vardef2);
+    if (type == ",") return cont(vardef1);
+  }
+  function maybeelse(type, value) {
+    if (type == "keyword b" && value == "else") return cont(pushlex("form"), statement, poplex);
+  }
+  function forspec1(type) {
+    if (type == "var") return cont(vardef1, expect(";"), forspec2);
+    if (type == ";") return cont(forspec2);
+    if (type == "variable") return cont(formaybein);
+    return pass(expression, expect(";"), forspec2);
+  }
+  function formaybein(_type, value) {
+    if (value == "in") return cont(expression);
+    return cont(maybeoperatorComma, forspec2);
+  }
+  function forspec2(type, value) {
+    if (type == ";") return cont(forspec3);
+    if (value == "in") return cont(expression);
+    return pass(expression, expect(";"), forspec3);
+  }
+  function forspec3(type) {
+    if (type != ")") cont(expression);
+  }
+  function functiondef(type, value) {
+    if (type == "variable") {register(value); return cont(functiondef);}
+    if (type == "(") return cont(pushlex(")"), pushcontext, commasep(funarg, ")"), poplex, statement, popcontext);
+  }
+  function funarg(type, value) {
+    if (type == "variable") {register(value); return isTS ? cont(maybetype) : cont();}
+  }
+
+  // Interface
+
+  return {
+    startState: function(basecolumn) {
+      return {
+        tokenize: jsTokenBase,
+        lastType: null,
+        cc: [],
+        lexical: new JSLexical((basecolumn || 0) - indentUnit, 0, "block", false),
+        localVars: parserConfig.localVars,
+        globalVars: parserConfig.globalVars,
+        context: parserConfig.localVars && {vars: parserConfig.localVars},
+        indented: 0
+      };
+    },
+
+    token: function(stream, state) {
+      if (stream.sol()) {
+        if (!state.lexical.hasOwnProperty("align"))
+          state.lexical.align = false;
+        state.indented = stream.indentation();
+      }
+      if (state.tokenize != jsTokenComment && stream.eatSpace()) return null;
+      var style = state.tokenize(stream, state);
+      if (type == "comment") return style;
+      state.lastType = type == "operator" && (content == "++" || content == "--") ? "incdec" : type;
+      return parseJS(state, style, type, content, stream);
+    },
+
+    indent: function(state, textAfter) {
+      if (state.tokenize == jsTokenComment) return CodeMirror.Pass;
+      if (state.tokenize != jsTokenBase) return 0;
+      var firstChar = textAfter && textAfter.charAt(0), lexical = state.lexical;
+      // Kludge to prevent 'maybelse' from blocking lexical scope pops
+      for (var i = state.cc.length - 1; i >= 0; --i) {
+        var c = state.cc[i];
+        if (c == poplex) lexical = lexical.prev;
+        else if (c != maybeelse || /^else\b/.test(textAfter)) break;
+      }
+      if (lexical.type == "stat" && firstChar == "}") lexical = lexical.prev;
+      if (statementIndent && lexical.type == ")" && lexical.prev.type == "stat")
+        lexical = lexical.prev;
+      var type = lexical.type, closing = firstChar == type;
+
+      if (type == "vardef") return lexical.indented + (state.lastType == "operator" || state.lastType == "," ? 4 : 0);
+      else if (type == "form" && firstChar == "{") return lexical.indented;
+      else if (type == "form") return lexical.indented + indentUnit;
+      else if (type == "stat")
+        return lexical.indented + (state.lastType == "operator" || state.lastType == "," ? statementIndent || indentUnit : 0);
+      else if (lexical.info == "switch" && !closing && parserConfig.doubleIndentSwitch != false)
+        return lexical.indented + (/^(?:case|default)\b/.test(textAfter) ? indentUnit : 2 * indentUnit);
+      else if (lexical.align) return lexical.column + (closing ? 0 : 1);
+      else return lexical.indented + (closing ? 0 : indentUnit);
+    },
+
+    electricChars: ":{}",
+    blockCommentStart: jsonMode ? null : "/*",
+    blockCommentEnd: jsonMode ? null : "*/",
+    lineComment: jsonMode ? null : "//",
+    fold: "brace",
+
+    helperType: jsonMode ? "json" : "javascript",
+    jsonMode: jsonMode
+  };
+});
+
+CodeMirror.defineMIME("text/javascript", "javascript");
+CodeMirror.defineMIME("text/ecmascript", "javascript");
+CodeMirror.defineMIME("application/javascript", "javascript");
+CodeMirror.defineMIME("application/ecmascript", "javascript");
+CodeMirror.defineMIME("application/json", {name: "javascript", json: true});
+CodeMirror.defineMIME("application/x-json", {name: "javascript", json: true});
+CodeMirror.defineMIME("text/typescript", { name: "javascript", typescript: true });
+CodeMirror.defineMIME("application/typescript", { name: "javascript", typescript: true });
+
+  </script>
+   <textarea id="code" cols="60" rows="30">
+//Stop!
+//go directly to the very bottom of this text and look for the function tick()
  
 function triangle(vertices,r,g,b){
     this.vertices = function(){
@@ -59,7 +651,7 @@ function triangle(vertices,r,g,b){
         glRender(this.vertices(),this.colors());
     };
 }
-//every triangle has three vertices, 
+//every triangle has three vertices,  
 //and each vertex has three coordinates x,y and z
 //thus, the triangle will need 9 coordinates all together
 //for example [0,0,-1,1,1,-1,1,-1,-1]
@@ -68,231 +660,26 @@ function triangle(vertices,r,g,b){
 //if you uncomment the following two lines of code
 //you should see a triangle (be sure to turn the tick function off down below)
 // 
-//var tri = new triangle([0,0,-1,1,1,-1,1,-1,-1],0,0,1);
-//tri.render();
+var tri = new triangle([0,0,-1,1,1,-1,1,-1,-1],0,0,1);
+tri.render();
 //
-//you will notice that the render function is calling glRender 
-//which is located in the html file
-//it's some pretty complicated webGL, and if you want to learn more
-//I'd suggest you check out the link
-//you should also notice that the colors takes a fourth value... no idea what that's about   
-//
-//following we have our basic shapes
-//all we have is a box and a pyramid for now
-//but hopefully we can all work together to make some other shapes
-
-function box(x,y,z,height,width,depth,r,g,b){
-    this.vertices = function(){
-        return [[x,y,z,x+width,y,z,x,y+height,z],[x+width,y,z,x,y+height,z,x+width,y+height,z],[x,y,z,x+width,y,z,x,y,z+depth],[x+width,y,z,x,y,z+depth,x+width,y,z+depth],[x+width,y,z+depth,x+width,y+height,z+depth,x,y+height,z+depth],[x+width,y,z+depth,x,y,z+depth,x,y+height,z+depth],[x+width,y+height,z+depth,x,y+height,z+depth,x,y+height,z],[x+width,y+height,z+depth,x,y+height,z,x+width,y+height,z],[x+width,y+height,z+depth,x+width,y,z+depth,x+width,y+height,z],[x+width,y,z,x+width,y,z+depth,x+width,y+height,z],[x,y+height,z+depth,x,y,z+depth,x,y+height,z],[x,y,z,x,y,z+depth,x,y+height,z]];
-        //,[x,y+height,z+depth,x,y,z+depth,x,y+height,z],[x+1,y,z,x,y,z+depth,x,y+height,z]
-    };
-    this.colors = function(){
-        var colors = [];
-        for(var i = 0; i<12;i++){
-            colors.push([r,g,b,1,r,g,b,1,r,g,b,0.1]);
-        }
-        return colors;
-    };
-    this.render = function(){
-        glRender(this.vertices(),this.colors());
-    };
-}
-
-function pyramid(x,y,z,height,angle,r,g,b){
-    var base = height*Math.tan(angle);
-    this.vertices = function(){
-        return [[x,y,z,x+base,y-height,z+base,x+base,y-height,z-base],[x,y,z,x-base,y-height,z+base,x-base,y-height,z-base],[x,y,z,x-base,y-height,z+base,x+base,y-height,z+base],[x,y,z,x-base,y-height,z-base,x+base,y-height,z-base]];
-    };
-    this.colors = function(){
-        var colors = [];
-        for(var i = 0; i<4;i++){
-            colors.push([r,g,b,1,r,g,b,1,r,g,b,0.1]);
-        }
-        return colors;
-    };
-    this.render = function(){
-        glRender(this.vertices(),this.colors());
-    };
-}
-//next up we have rotation and transpose
-//I hope they are fairly obvious, even though they may be a little complicated
-//the one thing to point out is that we use the add method to tell the object what to rotate
-//continuing from the triangle example:
-//var rot = new rotation(Math.PI/6,0,0);
-//rot.add(tri);
-//rot.render();
-
-
-function rotation(angleX,angleY,angleZ){
-    var array = [];
-    var colors = [];
-    this.add = function(obj){
-        for(var i = 0 ; i< obj.vertices().length;i++){
-            var temp = [];
-            for(var j = 0; j<8; j=j+3){
-                var x_ = (obj.vertices()[i][j]*Math.cos(angleZ)+obj.vertices()[i][j+1]*Math.sin(angleZ))*Math.cos(angleY)+obj.vertices()[i][j+2]*Math.sin(angleY);
-               var y_ =  (obj.vertices()[i][j+1]*Math.cos(angleZ)-obj.vertices()[i][j]*Math.sin(angleZ))*Math.cos(angleX)-(obj.vertices()[i][j+2]*Math.cos(angleY)-(obj.vertices()[i][j]*Math.cos(angleZ)+obj.vertices()[i][j+1]*Math.sin(angleZ))*Math.sin(angleY))*Math.sin(angleX);
-                var z_ =  Math.sin(angleX)*(obj.vertices()[i][j+1]*Math.cos(angleZ)-obj.vertices()[i][j]*Math.sin(angleZ))+Math.cos(angleX)*(obj.vertices()[i][j+2]*Math.cos(angleY)-Math.sin(angleY)*(obj.vertices()[i][j]*Math.cos(angleZ)+obj.vertices()[i][j+1]*Math.sin(angleZ)));
-                temp.push(x_,y_,z_);
-                
-            }
-        array.push(temp);    
-        colors.push(obj.colors()[i]);
-        }   
-    };
-    this.vertices = function(){
-        return array;
-    };
-    this.colors = function(){
-        return colors;
-    };
-    this.render = function(){
-        glRender(array,colors);
-    };
-}
-
-function transpose(x,y,z){
-    var array = [];
-    var colors = [];
-    this.add = function(obj){
-        for(var i = 0 ; i< obj.vertices().length;i++){
-        array.push(
-            [obj.vertices()[i][0]+x,obj.vertices()[i][1]+y,obj.vertices()[i][2]+z,
-            obj.vertices()[i][3]+x,obj.vertices()[i][4]+y,obj.vertices()[i][5]+z,
-            obj.vertices()[i][6]+x,obj.vertices()[i][7]+y,obj.vertices()[i][8]+z]
-                );
-        colors.push(obj.colors()[i]);
-        }        
-    };
-    this.vertices = function(){
-        return array;
-    };
-    this.colors = function(){
-        return colors;
-    };
-    this.render = function(){
-        glRender(array,colors);
-    };
-}
-
-//here's the scene function
-//this is where it all comes together  
-//you will find that you will get the best results by chaining multiple scenes together
-//for example, adding scene1 and scene2 to scene3 and then adding more stuff
-//to scene3 before adding it to scene4
-//it can get pretty cool  
-
-function scene(x,y,z,angleX,angleY,angleZ){
-    var vertices = [];
-    var colors = [];
-    this.add = function(obj){
-        var tempTrans = new transpose(x,y,z);
-        tempTrans.add(obj);
-        var tempRotate = new rotation(angleX,angleY,angleZ);
-        tempRotate.add(tempTrans);
-        for(var i = 0 ; i< obj.vertices().length;i++){
-            vertices.push(tempRotate.vertices()[i]);
-            colors.push(obj.colors()[i]);
-        }
-    };
-    this.vertices = function(){
-        
-        return vertices;
-    };
-    this.colors = function(){
-        return colors;
-    };
-    this.render = function(){
-        glRender(vertices,colors);
-    };
-}
-  
-//finally we're ready to program our scene
-//I assume this is all fairly self evident
-
-function tree(x,z){
-    var greenBox = new box(-0.4+x,1,-0.4-z,1.3,1.8,1.8,0.5,1,0);
-    var trunk = new box(x,-1,-z,2,1,1,0.7,0.5,0.2);
-    scene1.add(greenBox);
-    scene1.add(trunk);
-}
-function sand(x,z){
-    var yellowBox = new box(x-3,-2,-z-4,0.5,18,18,1,1,0);
-    scene1.add(yellowBox);
-}
-function lake(x,z,ripples){
-    var blueBox = new box(x,-1.5,-z,0.3,4,4,0,0.1,1);
-    var ripple = new box(x,-1.4,-z+ripples,0.3,4,1/10,0,0.7,1);
-    var rotLake = new rotation(0,3/4*Math.PI,0);
-    rotLake.add(blueBox);
-    rotLake.add(ripple);
-    scene1.add(rotLake);
-}
-function bird(x,z){
-    var birdTemp = new box(x,3,-z,0.5,1,1,1,0.5,0);
-    scene1.add(birdTemp);
-}
-
-function mountain(x,z){
-    var mountain1 = new pyramid(0,6,0,9,Math.PI/8,0.2,0.2,0.6);
-    var peak = new pyramid(0,6.1,0,2,Math.PI/8,0.7,0.8,0.8);
-    var rotMountain = new rotation(0,1/4*Math.PI,0);
-    rotMountain.add(mountain1);
-    rotMountain.add(peak);
-    var transpose1 = new transpose(x,0,z);
-    transpose1.add(rotMountain);
-    scene1.add(transpose1);
-}
-//here we get ready to animate stuff
-
-var ticker = 0;
-var rippleTicker = 0; 
-var animateTicker = 0;
-function tick(){
-  
-    scene1 = new scene(0,0,0,1/4*Math.PI,0,0*ticker);
-    camera = new scene(0,0,-5-animateTicker,animateTicker/3,0,0);
-    
-    bird(-2*ticker+5,4);
-    tree(3,1);
-    tree(1,3);
-    tree(2,4);
-    tree(4,3);
-    sand(-4,8);
-    lake(-1,4,rippleTicker);
-    lake(3,2,rippleTicker); 
-    lake(3,6,rippleTicker);
-    mountain(0,-14);   
-    mountain(6,-12);
-    mountain(-5,-15);
-    
-    camera.add(scene1);
-    if (ticker<4*Math.PI){ticker = ticker +0.05;}
-    else{ticker = 0;}
-    if (rippleTicker<4){rippleTicker += 0.03;}
-    else{rippleTicker = 0;}
-    if(animateTicker>-3){
-        animateTicker -= 0.01;  
-    }
-    camera.render();
-    //this requests another function in the html
-    request = requestAnimFrame(function(){tick();});
-    
-}
-//and finally we call tick
-tick();
-</textarea>
-<script>
+  </textarea>
+  <script>
+    var myCodeMirror = CodeMirror.fromTextArea(code,{
+      lineNumbers:true,
+      lineWrapping:true
+    });
+ 
 //here we initialize the canvas and the console to write code in
 var canvas = document.getElementById("canvas");
 var gl = canvas.getContext("experimental-webgl");
-var cnsl = document.getElementById('console');
+var cnsl = document.getElementById('code');
 //this obviously evaluates the code in the text editor
 //note that if you are using this in codeacademy
 //you will actually have to copy and paste the code from the html into the text editor. I do not know why
 function run() {  
-   
-    return eval(cnsl.value); 
+   var l = myCodeMirror.getValue()
+    return eval(l); 
 }
   function stop() {  
    
@@ -402,19 +789,5 @@ function glRender(vertices,colors){
         gl.flush();
 }
 </script>
- <div>
-  <p>On the right is the code to animate this world</P>
-   <p>Try your hand at making your own world</P>
-  <p>Or room, or spaceship, or whatever</P>
-
-    <li><a href="http://learningwebgl.com/blog/?p=28"> Learn webGL</a></li>
-    <li><a href="http://jsbin.com/OLozuKA/18">Save your code</a></li>
-    <li><a href="http://jsbin.com/ixeV/1">View what others have created</a></li>
-    <li><a href="http://jsbin.com/OLozuKA/18">Load tools (for example, spheres, cylinders,curves, lighting, transparency, fractals...)</a></li>
-    <li><a href="http://jsbin.com/OLozuKA/18">Other cool stuff?</a></li>
-    <p>You can contact me on Skype if you're not coming from Codecademy: chuphay</P>
-</div>
 </body>
-
 </html>
- 
