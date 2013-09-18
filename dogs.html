@@ -10,17 +10,19 @@
 		<div id="green">✓</div>
 		<div id="red">X</div>
 		<div id = "link"><a id="orange" href="https://github.com/Chuphay/chuphay.github.io">View on GitHub</a></div>
-		try once again	
+		this should work	
 		<script>
 			
             var data = "hello there, haha";
             cenny.add(data, 'thsswsswsawsisIsAKEYF42');
             
             //get data
-            cenny.get('alertMe', 'thsswsswsawsisIsAKEYF42');
-            
+            function alertMe(){
+            	
+            	cenny.get('sendAlert', 'thsswsswsawsisIsAKEYF42');
+            }
             //acting function
-            function alertMe(theData) {
+            function sendAlert(theData) {
                 alert(theData);   
             }
 		</script>
