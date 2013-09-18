@@ -3,11 +3,27 @@
     <head>
         <title>Button</title>
 	<link rel='stylesheet' type='text/css' href='stylesheets/stylesheet.css'/>
-	</head>
+	<script src = 'http://loadfive.com/cenny.js'></script>
+    </head>
 	<body>
 		<div id="orange"><br/>Submit!</div>
 		<div id="green">✓</div>
 		<div id="red">X</div>
 		<div id = "link"><a id="orange" href="https://github.com/Chuphay/chuphay.github.io">View on GitHub</a></div>
+	
+		<script>
+			
+            var data = "hello there, haha";
+            cenny.add(data, 'thsswsswsawsisIsAKEYF42');
+            
+            //get data
+            cenny.get('actHere', 'thsswsswsawsisIsAKEYF42');
+            
+            //acting function
+            var actHere = function(theData) {
+                alert(theData);   
+            }
+		</script>			
 	</body>
+	
 </html>
