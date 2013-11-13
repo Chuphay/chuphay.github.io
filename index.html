@@ -73,9 +73,9 @@ Password<input type="password" name="pswrd"/>
       </td>
       <td>
          <div>
-  <p>On the right is the code to make this world.Try your hand at making your own world.Or room, or spaceship, or whatever</P>
+  <div id = "log">loger:</div>
   </td><td>
-    <li><a href="https://github.com/threeDcode/threeDcode">View on GitHub</a></li>
+    <li><a href="https://github.com/Chuphay/chuphay.github.io">View on GitHub</a></li>
    <!-- <li><a href="http://learningwebgl.com/blog/?p=28"> Learn webGL</a></li> -->
     <li><a href="http://www.codecademy.com/">learn javascript</a></li>
     <li><a href="http://jsbin.com/OLozuKA/18">View what others have created</a></li>
@@ -98,7 +98,7 @@ Password<input type="password" name="pswrd"/>
 <canvas id="canvas" style="border: none; background-color: grey;" width="500" height="500"></canvas>
       </td>
         <td><button onclick="run()"> run </button></td>
-  
+          <td><button onclick ="stop()"> stop </button></td>
   </table>
 
    <textarea id="code" cols="60" rows="30">
@@ -291,24 +291,17 @@ tick();
 //here we initialize the canvas and the console to write code in
 var canvas = document.getElementById("canvas");
 var gl = canvas.getContext("experimental-webgl");
-var isRunning = false;
+
 //this obviously evaluates the code in the text editor
 
 function run() { 
-  if(isRunning){
-    stop()
-  
+
    var l = myCodeMirror.getValue()
     return eval(l); 
-  }
-  else{
-    isRunning = true;
-    var l = myCodeMirror.getValue()
-    return eval(l); 
-  }
+ 
 }
 function stop(){
-  isRunning = false;
+  
   cancelRequestAnimFrame(request);
 }
 var requestAnimFrame = (function(){
