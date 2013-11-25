@@ -58,7 +58,7 @@ table {
   /* Set height, width, borders, and global font properties here */
   font-family: monospace;
   height: 500px;
-  width:700px;
+  width:600px;
   font-size:120%;
   background: #0C1021; color: #F8F8F8
 }
