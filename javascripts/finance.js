@@ -97,3 +97,39 @@ disney.graphSimpleRate(context2);
 context2.beginPath();
 context2.strokeStyle = "#f12aa0";
 disney.fourierGraph(context2);
+var currentX = 0;
+var currentY = 0;
+function steps(screen,n) {
+    currentX = 0;
+    currentY = 0;
+    var spacing = 1;
+    var otherSpacing =1;
+    for(var i=0;i<n;i++){
+        var rdm = 2*Math.random()-1;
+        
+        if (rdm>=0){
+            draw(screen,currentX,currentY,currentX + spacing,currentY +otherSpacing);
+            currentX = currentX + spacing;
+            currentY = currentY +otherSpacing;
+        }
+        else {
+            draw(screen,currentX,currentY,currentX + spacing,currentY -otherSpacing);
+            currentX = currentX + spacing;
+            currentY = currentY -otherSpacing;
+        }
+        
+    }
+}
+
+function monteCarlo(screen,m,n) {
+    for (var i = 0; i < m; i++) {
+        currentY = 0;
+        var color = "#ff"+i+"000";
+        context3.beginPath();
+        context3.strokeStyle = color;
+        steps(screen,n);
+        var index = i;   
+    }    
+}
+monteCarlo(context3,10,200);
+
