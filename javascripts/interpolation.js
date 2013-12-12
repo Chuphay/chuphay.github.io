@@ -24,18 +24,49 @@ function dot(screen,x,y,color){
 }
 
 //this code let's us write to the html
-data = []; 
-for(var i = 0; i<10;i++){
-  var temp = 180*Math.random();
-  data.push(temp);
-  dot(context1,40*i,temp,"yellow");
-}
+
 function write(x){
     window.onload = function(){
         document.getElementById("console").innerHTML = x;
     };
 }
+//here we set up our initial data set
+data = [];
+xValue = [];
+for(var i = 0; i<11;i++){
+  
+  data.push(180*Math.random());
+  xValue.push(40*i);
+  dot(context1,xValue[i]-5,data[i],"yellow");
+}
+//here we write a little helper function to check which line segment
+//x belongs in 
+function checkLineSegment(xValues,x){
+  for(var j = 0; j<data.length;j++){
+    if (x<xValue[j]){
+      return [xValue[j-1],xValue[j]]; 
+    }
+  }
+}
+//here's the linear interpolation
+//what we are trying to do is find f(x) when we only have
+//a limited number of datapoints
+//the function takes three arguments: data, xValue, and x
+//x is the value of x inputed into f(x)
+//xValue, for this example, is [0,40,80,...]. 
+//and the data is [f(0),f(40),f(80),...]
+//not sure if I explained that well...
+function linear(data,xValue,x){
+  //this just simply draws the lines
+  //we'll do a better job of this in the quadratic interpolation
+  for(var i = 0; i<data.length;i++){
+      draw(context1,xValue[i],data[i],xValue[i+1],data[i+1]);
+  }
+  //here, we want to check which segment x is in
+  return checkLineSegment(xValue,x);
+ 
+}
+chk = linear(data,xValue,119); 
 
 
-
-write(["<br> Expected rate of return: <br>  <br>new line" ]);
+write(["<br> Expected rate of return: <br>  <br>new line <br>" + chk ]);
