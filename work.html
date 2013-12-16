@@ -54,6 +54,7 @@ Password<input type="password" name="pswrd"/>
   <div id = "log">loger: div id= "log"</div>
   </td><td>
     <li><a href="https://github.com/Chuphay/chuphay.github.io">View on GitHub</a></li>
+    <li><a href="/">back to the main page</a></li>
 
 </div>
       </td>
@@ -94,10 +95,9 @@ function draw(a,b,x,y){
 
 //this code let's us write to the html
 function write(x){
-    window.onload = function(){
         document.getElementById("log").innerHTML = x;
-    };
 }
+write("hello")
   </textarea>
   <script>
     var myCodeMirror = CodeMirror.fromTextArea(code,{
