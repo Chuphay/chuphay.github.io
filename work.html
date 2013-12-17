@@ -66,18 +66,11 @@ Password<input type="password" name="pswrd"/>
    <!-- MAIN CONTENT -->
   
   <h3>Work</h3>
- 
-<table>
+  <table border="1">
 
-<tr>
-
-<td>
-  <tr><canvas id="canvas1" width="500" height="250"></tr>
-  <tr><canvas id="canvas2" width="500" height="250"></tr>
-</td>
-
-<td>
-   <textarea id="code" cols="60" rows="30">
+  <tr>
+   <td><canvas id="canvas2" style="border: none; background-color: grey;" width="500" height="250"></td>
+   <td rowspan="2"><textarea id="code" cols="60" rows="30">
 //this sets up the canvas   
 var my_canvas = document.getElementById('canvas1');
 var ctx1 = my_canvas.getContext("2d");
@@ -101,19 +94,19 @@ function write(x){
         document.getElementById("log").innerHTML = x;
 }
 write("hello")
-  </textarea>
-  
-</td>
-
-</tr>
-<tr><button onclick="run()"> run </button></td></tr>
+  </textarea></td>
+  </tr>
+  <tr>
+    <td><canvas id="canvas1" style="border: none; background-color: grey;" width="500" height="250"></td>
+  </tr>
 
 </table>
+ 
+<button onclick="run()"> run </button>
 
 
 
-
-  <script>
+<script>
     var myCodeMirror = CodeMirror.fromTextArea(code,{
       lineNumbers:true,
       lineWrapping:true
