@@ -65,17 +65,17 @@ Password<input type="password" name="pswrd"/>
   
    <!-- MAIN CONTENT -->
   
-  <h3>Work test java</h3>
+  <h3>Work</h3>
   <table border="1">
 
   <tr>
    
    <td rowspan="2"><textarea id="code" cols="60" rows="30">
-     //this sets up the canvas   
+//this sets up the canvas   
 var my_canvas = document.getElementById('canvas1');
 var ctx1 = my_canvas.getContext("2d");
 var my_canvas = document.getElementById('canvas2');
-var ctx2 = my_canvas.getContext("2d");
+var ctx2t = my_canvas.getContext("2d");
 
 //this flips the canvas over for usual math duties
 context.transform(1,0,0,-1.0,0,500);
@@ -94,7 +94,7 @@ function write(x){
         document.getElementById("log").innerHTML = x;
 }
 write("hello")
-   /textarea></td>
+  </textarea></td>
   <td><canvas id="canvas2" style="border: none; background-color: grey;" width="500" height="250"></td>
   </tr>
   <tr>
@@ -104,7 +104,6 @@ write("hello")
 </table>
  
 <button onclick="run()"> run </button>
-
 
 
 
