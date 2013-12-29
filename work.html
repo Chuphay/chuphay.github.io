@@ -34,7 +34,7 @@
       </td>
       <td>
   
-  <p>worked pretty good</p>
+  <p>still having problems</p>
   <form name="login">
     <td>
 World_Name<input type="text" name="userid"/>
@@ -70,16 +70,18 @@ Password<input type="password" name="pswrd"/>
 
   <tr>
    
-   <td rowspan="2"><textarea id="code" cols="60" rows="30">
+   <td rowspan="2">
+<textarea id="code" cols="60" rows="30">
    
 //this sets up the canvas   
 var my_canvas = document.getElementById('canvas1');
 var ctx1 = my_canvas.getContext("2d");
 var my_canvas = document.getElementById('canvas2');
-var ctx2t = my_canvas.getContext("2d");
+var ctx2 = my_canvas.getContext("2d");
 
 //this flips the canvas over for usual math duties
-context.transform(1,0,0,-1.0,0,500);
+ctx1.transform(1,0,0,-1.0,0,500);
+ctx2.transform(1,0,0,-1.0,0,500);
 
 //this let's us draw to the canvas
 //a,b is the current position
@@ -95,7 +97,8 @@ function write(x){
         document.getElementById("log").innerHTML = x;
 }
 write("hello")
-  </textarea></td>
+</textarea>
+</td>
   <td><canvas id="canvas2" style="border: none; background-color: grey;" width="500" height="250"></td>
   </tr>
   <tr>
