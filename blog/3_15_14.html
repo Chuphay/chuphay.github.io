@@ -1657,7 +1657,8 @@ body{background-color: #EFEEEC;
     padding: 20px;
     overflow: visible;
 }
-p{font-size:15px;}  
+p{font-size:15px;
+}  
 .input_area {
   padding: 0.2em;
 }
@@ -1709,9 +1710,9 @@ init_mathjax();
 </div>
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>If we have a function \(f(x)\) then the fourier transform is defined as</p>
-<p>\[A_{k} = \int_{-\infty}^{\infty} f(x) e^{-i\pi k} dx\]</p>
+<p>\[A_{k} = \int_{-\infty}^{\infty} f(x) e^{-ikx} dx\]</p>
 <p>From this definition, we can build an approximation of \(f(x)\) in the following way</p>
-<p>\[f(x) = A_{0} + A_{1}e^{i\pi} + A_{2}e^{2i\pi} +  A_{3}e^{3i\pi} + ...\]</p>
+<p>\[f(x) = A_{0} + A_{1}e^{ix} + A_{2}e^{2ix} +  A_{3}e^{3ix} + ...\]</p>
 </div>
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Obviously the more terms included in this expansion, the better the model will be.</p>
@@ -4389,6 +4390,8 @@ AElFTkSuQmCC
 <p>I also feel like I have a slightly better understanding of why the FFT produces this kind of graph, although still not completely convinced.</p>
 <p>Anyways, questions, comments, or just want to chat. email me at chuphay@gmail.com</p>
 </div>
-<li><a href="/">to the archive</a></li>
+<div>
+<li><a href="/blog/">to the archive</a></li>
+</div>
 </body>
 </html>
