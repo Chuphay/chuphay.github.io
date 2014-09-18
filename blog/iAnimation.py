@@ -36,6 +36,7 @@ var x_shift = {x}*scaleConstant;
 var y_shift = {y}*scaleConstant;
 context.transform(scaleConstant,0,0,scaleConstant,x_shift, y_shift);
 """.format(scale = str(scale), x = str(x), y = str(y))
+        self._message  = '<p>new message</p>'
 
 
     def next_position(self, fn):
@@ -70,7 +71,7 @@ based upon its previous position."""
         
         self._next += '\t' + lines[-1].strip() +';\n'+ '}\n'
         
-    def animate(self, init, x = 0, y = 1, clear_screen = True):
+    def animate(self, init, x = 0, y = 1, clear_screen = True, tick = 1):
         """init must be a valid array to set the initial position of the object.
         x and y are the coordinates to be drawn. For example, if your function takes an array 
         [x, x_velocity, y, y_velocity] , then your initial position might be pos = [1,0,0,0] and x = pos[0], y = pos[2].
@@ -88,16 +89,24 @@ based upon its previous position."""
             raise   
   
         self._main = """var x = {init};
+ticker = 0;       
 function main(){{
     {comment}context.clearRect(0,0,canvas.width/scaleConstant,canvas.height/scaleConstant);
-    x = next(x);
+    ticker++;
+    if(ticker >= {tick}){{
+        ticker = 0;
+        x = next(x);
+    }}    
+ 
+        
     draw(x[{x}],x[{y}]);
+        
     requestAnimFrame(function(){{main();}}); 
 }}
 main();
-</script>""".format(comment = '' if clear_screen else '//', init = str(init) , x = str(x), y = str(y))
+</script>""".format(comment = '' if clear_screen else '//', init = str(init) , x = str(x), y = str(y), tick = str(tick))
         
-        raw_html = self._canvas + self._script_start + _request + _draw + self._next + self._main
+        raw_html = self._canvas + self._script_start + _request + _draw + self._next + self._main + self._message
         return HTML(raw_html)
         
     
