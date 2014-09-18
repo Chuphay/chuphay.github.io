@@ -27,6 +27,10 @@ class iAnimation(object):
         
         self._canvas = """<canvas id='canvas' width = '{0}' height = '{1}'  style='border:1px solid #000000; background-color: grey;'>
         </canvas>\n""".format(width, height)
+
+        self._scale = scale
+        self.x_shift = x
+        self.y_shift = y
         
         self._script_start = """<script>
 var canvas = document.getElementById('canvas');
@@ -36,7 +40,7 @@ var x_shift = {x}*scaleConstant;
 var y_shift = {y}*scaleConstant;
 context.transform(scaleConstant,0,0,scaleConstant,x_shift, y_shift);
 """.format(scale = str(scale), x = str(x), y = str(y))
-        self._message  = '<p>new message</p>'
+        self._message  = '<p>message</p>'
 
 
     def next_position(self, fn):
@@ -91,7 +95,7 @@ based upon its previous position."""
         self._main = """var x = {init};
 ticker = 0;       
 function main(){{
-    {comment}context.clearRect(0,0,canvas.width/scaleConstant,canvas.height/scaleConstant);
+    {comment}context.clearRect(-{x_shift},-{y_shift}, canvas.width/scaleConstant,canvas.height/scaleConstant);
     ticker++;
     if(ticker >= {tick}){{
         ticker = 0;
@@ -104,7 +108,8 @@ function main(){{
     requestAnimFrame(function(){{main();}}); 
 }}
 main();
-</script>""".format(comment = '' if clear_screen else '//', init = str(init) , x = str(x), y = str(y), tick = str(tick))
+</script>""".format(comment = '' if clear_screen else '//', init = str(init) ,
+x_shift = str(self.x_shift), y_shift = str(self.y_shift), x = str(x), y = str(y), tick = str(tick))
         
         raw_html = self._canvas + self._script_start + _request + _draw + self._next + self._main + self._message
         return HTML(raw_html)
