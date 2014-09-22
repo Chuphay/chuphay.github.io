@@ -55,9 +55,9 @@ based upon its previous position."""
       
       
         if (lines[0][:3] != 'def'):
-            raise SyntaxError, 'unrecognized syntax, the function must begin with "def"'
+            raise SyntaxError('unrecognized syntax, the function must begin with "def"')
         if (lines[-1].strip()[:6] != 'return'):
-            raise SyntaxError, 'unrecognized syntax, the function must end with "return"'
+            raise SyntaxError( 'unrecognized syntax, the function must end with "return"')
             
         self._function = True
         var_name = getargspec(self._fn).args[0]
@@ -83,12 +83,12 @@ based upon its previous position."""
         """
         
         if(self._function != True):
-            raise RuntimeError, 'Before animating, you must give a function to animate. \n Use .function'
+            raise RuntimeError( 'Before animating, you must give a function to animate. \n Use .function')
         
         try:
             z = self._fn(init)
             if(len(z) != len(init)):
-                raise IndexError, 'length of init must be the same length as that returned by y'
+                raise IndexError('length of init must be the same length as that returned by y')
         except:
             raise   
   
