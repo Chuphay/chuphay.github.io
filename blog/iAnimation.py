@@ -1,5 +1,6 @@
 from IPython.core.display import HTML
 from inspect import getsourcelines, getargspec
+from iAnimation.iParser import parse
 
 
 _draw  =  """function draw(x,y){ 
@@ -41,7 +42,8 @@ var y_shift = {y}*scaleConstant;
 context.transform(scaleConstant,0,0,scaleConstant,x_shift, y_shift);
 """.format(scale = str(scale), x = str(x), y = str(y))
         self._message  = '<p>message</p>'
-
+    def add_object(self, fn, args = None):
+        print('add-object arg: ' +str(args))
 
     def next_position(self, fn):
         """The argument must be a function that takes an array of values.
