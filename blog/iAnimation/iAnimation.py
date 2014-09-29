@@ -1,31 +1,15 @@
 from IPython.core.display import HTML
 from inspect import getsourcelines, getargspec
 from iAnimation.iParser import parse
-from iAnimation.js import _draw
+from iAnimation.js import _draw, _request
 
-
-"""_draw  = function draw(x,y){ 
-    context.beginPath();
-    context.rect(x, y, 1/scaleConstant, 1/scaleConstant);
-    context.fillStyle = 'black';
-    context.fill();  
-}\n"""
-
-_request = """window.requestAnimFrame = (function(callback) {
-    return window.requestAnimationFrame || 
-    window.webkitRequestAnimationFrame || 
-    window.mozRequestAnimationFrame || 
-    window.oRequestAnimationFrame || 
-    window.msRequestAnimationFrame ||
-    function(callback) {
-          window.setTimeout(callback, 1000 / 90);
-    };})();\n"""
 
 
 
 class iAnimation(object):
     def __init__(self, width = '600px', height = '400px', scale = 1, x = 0, y = 0):
         self._function = False
+        self._add_object = False
         
         self._canvas = """<canvas id='canvas' width = '{0}' height = '{1}'  style='border:1px solid #000000; background-color: grey;'>
         </canvas>\n""".format(width, height)
@@ -33,6 +17,7 @@ class iAnimation(object):
         self._scale = scale
         self.x_shift = x
         self.y_shift = y
+        self._globals = ''
         
         self._script_start = """<script>
 var canvas = document.getElementById('canvas');
@@ -50,12 +35,13 @@ context.transform(scaleConstant,0,0,scaleConstant,x_shift, y_shift);
 
 
     def add_object(self, fn, args = None):
-        print('add-object arg: ' +str(args))
-        print(parse(fn))
+        self._add_object = True
+        self._next =  parse(fn)
 
     
-
-
+    def add_globals(self, variables, values):
+        for i, e in enumerate(variables):
+            self._globals += e + ' = ' + str(values[i]) +';\n'
 
 
     def next_position(self, fn):
@@ -93,43 +79,57 @@ based upon its previous position."""
     
 
 
-    def animate(self, init, x = 0, y = 1, clear_screen = True, tick = 1):
+    def animate(self, init = [0,0], x = 0, y = 1, clear_screen = True, tick = 1):
         """init must be a valid array to set the initial position of the object.
         x and y are the coordinates to be drawn. For example, if your function takes an array 
         [x, x_velocity, y, y_velocity] , then your initial position might be pos = [1,0,0,0] and x = pos[0], y = pos[2].
         By default it will just plot the first two array values returned from next_position
         """
         
-        if(self._function != True):
-            raise RuntimeError( 'Before animating, you must give a function to animate. \n Use .function')
+        if(self._function == True):
         
-        try:
-            z = self._fn(init)
-            if(len(z) != len(init)):
-                raise IndexError('length of init must be the same length as that returned by y')
-        except:
-            raise RuntimeError('weird... ')   
+            try:
+                z = self._fn(init)
+                if(len(z) != len(init)):
+                    raise IndexError('length of init must be the same length as that returned by y')
+            except:
+                raise RuntimeError('weird... ')   
   
-        self._main = """var x = {init};
-ticker = 0;       
-function main(){{
-    {comment}context.clearRect(-{x_shift},-{y_shift}, canvas.width/scaleConstant,canvas.height/scaleConstant);
-    ticker++;
-    if(ticker >= {tick}){{
-        ticker = 0;
-        x = next(x);
-    }}    
- 
+            self._main = """var x = {init};
+            ticker = 0;       
+            function main(){{
+            {comment}context.clearRect(-{x_shift},-{y_shift}, canvas.width/scaleConstant,canvas.height/scaleConstant);
+            ticker++;
+            if(ticker >= {tick}){{
+            ticker = 0;
+            x = next(x);
+            }}            
+            draw_pixel(x[{x}],x[{y}]);
+            requestAnimFrame(function(){{main();}}); 
+            }}
+            main();
+            </script>""".format(comment = '' if clear_screen else '//', init = str(init) ,
+                                x_shift = str(self.x_shift), y_shift = str(self.y_shift), x = str(x), y = str(y), tick = str(tick))
         
-    draw_pixel(x[{x}],x[{y}]);
-        
-    requestAnimFrame(function(){{main();}}); 
-}}
-main();
-</script>""".format(comment = '' if clear_screen else '//', init = str(init) ,
-x_shift = str(self.x_shift), y_shift = str(self.y_shift), x = str(x), y = str(y), tick = str(tick))
-        
-        raw_html = self._canvas + self._script_start + _request + _draw + self._next + self._main + self._message
+        elif(self._add_object == True):
+            self._main = """var x = {init};
+            ticker = 0;       
+            function main(){{
+            {comment}context.clearRect(-{x_shift},-{y_shift}, canvas.width/scaleConstant,canvas.height/scaleConstant);
+            ticker++;
+            if(ticker >= {tick}){{
+            ticker = 0;
+            next();
+            }}            
+            requestAnimFrame(function(){{main();}}); 
+            }}
+            main();
+            </script>""".format(comment = '' if clear_screen else '//', init = str(init) ,
+                                x_shift = str(self.x_shift), y_shift = str(self.y_shift), x = str(x), y = str(y), tick = str(tick))
+
+        else:
+            raise KeyError('yeah... you messed something up')
+        raw_html = self._canvas + self._script_start + _request + _draw + self._globals + self._next + self._main + self._message
         return HTML(raw_html)
         
     

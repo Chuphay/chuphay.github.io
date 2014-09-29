@@ -1,5 +1,5 @@
 from inspect import getsourcelines, getargspec 
-from iAnimation.js import draw
+from iAnimation.js import interpret
    
 def internal_parser(line, spot):
     """checking for indentation"""
@@ -20,7 +20,8 @@ def parse(fn):
     try:
         var_name = getargspec(fn).args[0]
     except IndexError:
-        print("function has no argument")
+        #print("function has no argument")
+        pass
     #the spot variable will be used to keep track of spacing and indentation
     spot = 0 
 
@@ -57,9 +58,17 @@ def parse(fn):
             
         #here's some more specific commands    
         elif(line[:3] == 'iA.'):
-            output += ' '*spot + line[3:] +';\n'
+            try:
+                out = interpret(line[3:])
+                output += ' '*spot + out +';\n'
+            except:
+                raise KeyError("couldn't evaluate the expression :(")
         elif(line[:11] == 'iAnimation.'):
-            output += ' '*spot + line[11:] +';\n'
+            try:
+                out = interpret(line[11:])
+                output += ' '*spot + out +';\n'
+            except:
+                raise KeyError("couldn't evaluate the expression :(")
 
             
         
