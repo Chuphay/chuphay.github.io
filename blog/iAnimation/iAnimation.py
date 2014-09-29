@@ -17,7 +17,8 @@ class iAnimation(object):
         self._scale = scale
         self.x_shift = x
         self.y_shift = y
-        self._globals = ''
+        self._globals = []
+        self._globals_string = ''
         
         self._script_start = """<script>
 var canvas = document.getElementById('canvas');
@@ -29,7 +30,16 @@ context.transform(scaleConstant,0,0,scaleConstant,x_shift, y_shift);
 """.format(scale = str(scale), x = str(x), y = str(y))
         self._message  = ''
     
-
+    def message(self, arg):
+        """this is a hack job designed specifically to support finding the area of a circle"""
+        if type(arg) is str:
+            self._message += "'{0}' ".format(arg)
+        else:
+            for i, e in enumerate(arg):
+                if (type(e) is str) and (i == 0):
+                    self._message += "'{0}' ".format(e)
+                else:    
+                    self._message += "+ 4*count/total"
 
 
 
@@ -41,7 +51,8 @@ context.transform(scaleConstant,0,0,scaleConstant,x_shift, y_shift);
     
     def add_globals(self, variables, values):
         for i, e in enumerate(variables):
-            self._globals += e + ' = ' + str(values[i]) +';\n'
+            self._globals.append(e)
+            self._globals_string += e + ' = ' + str(values[i]) +';\n'
 
 
     def next_position(self, fn):
@@ -111,8 +122,14 @@ based upon its previous position."""
             </script>""".format(comment = '' if clear_screen else '//', init = str(init) ,
                                 x_shift = str(self.x_shift), y_shift = str(self.y_shift), x = str(x), y = str(y), tick = str(tick))
         
+
+        
         elif(self._add_object == True):
+
             self._main = """var x = {init};
+            function write(x){{
+            document.getElementById("log").innerHTML = x;
+            }}
             ticker = 0;       
             function main(){{
             {comment}context.clearRect(-{x_shift},-{y_shift}, canvas.width/scaleConstant,canvas.height/scaleConstant);
@@ -120,16 +137,21 @@ based upon its previous position."""
             if(ticker >= {tick}){{
             ticker = 0;
             next();
+            write({message});
             }}            
             requestAnimFrame(function(){{main();}}); 
             }}
             main();
-            </script>""".format(comment = '' if clear_screen else '//', init = str(init) ,
-                                x_shift = str(self.x_shift), y_shift = str(self.y_shift), x = str(x), y = str(y), tick = str(tick))
+ 
+
+            </script>
+            <div id = 'log'></div>""".format(comment = '' if clear_screen else '//', init = str(init) ,
+                                x_shift = str(self.x_shift), y_shift = str(self.y_shift), x = str(x), 
+                                             y = str(y), tick = str(tick), message = self._message)
 
         else:
             raise KeyError('yeah... you messed something up')
-        raw_html = self._canvas + self._script_start + _request + _draw + self._globals + self._next + self._main + self._message
+        raw_html = self._canvas + self._script_start + _request + _draw + self._globals_string + self._next + self._main
         return HTML(raw_html)
         
     
