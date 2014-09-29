@@ -1,4 +1,5 @@
 from inspect import getsourcelines, getargspec 
+from iAnimation.js import draw
    
 def internal_parser(line, spot):
     """checking for indentation"""
@@ -13,7 +14,7 @@ def internal_parser(line, spot):
     return spot    
     
 def parse(fn):
-    print("FUNCTION NAME: " + fn.__name__)
+    #print("FUNCTION NAME: " + fn.__name__)
     z, g = getsourcelines(fn)
     output = ''
     try:

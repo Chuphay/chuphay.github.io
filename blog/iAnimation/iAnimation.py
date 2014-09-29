@@ -1,9 +1,10 @@
 from IPython.core.display import HTML
 from inspect import getsourcelines, getargspec
 from iAnimation.iParser import parse
+from iAnimation.js import _draw
 
 
-_draw  =  """function draw(x,y){ 
+"""_draw  = function draw(x,y){ 
     context.beginPath();
     context.rect(x, y, 1/scaleConstant, 1/scaleConstant);
     context.fillStyle = 'black';
@@ -41,9 +42,21 @@ var x_shift = {x}*scaleConstant;
 var y_shift = {y}*scaleConstant;
 context.transform(scaleConstant,0,0,scaleConstant,x_shift, y_shift);
 """.format(scale = str(scale), x = str(x), y = str(y))
-        self._message  = '<p>message</p>'
+        self._message  = ''
+    
+
+
+
+
+
     def add_object(self, fn, args = None):
         print('add-object arg: ' +str(args))
+        print(parse(fn))
+
+    
+
+
+
 
     def next_position(self, fn):
         """The argument must be a function that takes an array of values.
@@ -77,6 +90,9 @@ based upon its previous position."""
         
         self._next += '\t' + lines[-1].strip() +';\n'+ '}\n'
         
+    
+
+
     def animate(self, init, x = 0, y = 1, clear_screen = True, tick = 1):
         """init must be a valid array to set the initial position of the object.
         x and y are the coordinates to be drawn. For example, if your function takes an array 
@@ -92,7 +108,7 @@ based upon its previous position."""
             if(len(z) != len(init)):
                 raise IndexError('length of init must be the same length as that returned by y')
         except:
-            raise   
+            raise RuntimeError('weird... ')   
   
         self._main = """var x = {init};
 ticker = 0;       
@@ -105,7 +121,7 @@ function main(){{
     }}    
  
         
-    draw(x[{x}],x[{y}]);
+    draw_pixel(x[{x}],x[{y}]);
         
     requestAnimFrame(function(){{main();}}); 
 }}
