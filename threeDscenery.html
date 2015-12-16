@@ -102,185 +102,261 @@ Password<input type="password" name="pswrd"/>
   </table>
 
    <textarea id="code" cols="60" rows="30">
-//Making your own maze is easy
-//Scroll down to line 61 and follow the directions there
+//Stop!
+//go directly to the very bottom of this text and look for the function tick()
+//and follow the directions there  
 //
 //
 //
 //
+//alright, now that you have an idea of what to do
+//I will spell out pretty explicitly what's going on
+//3D graphics is all about triangles
+//so that's where we start
+//this triangle function will construct new triangles
+//take a look at it
+ 
+function triangle(vertices,r,g,b){
+    this.vertices = function(){
+        return [vertices];
+    };
+    this.colors = function(){   
+        return [[r,g,b,1,r,g,b,1,r,g,b,0.1]];
+    };
+    this.render = function(){
+        glRender(this.vertices(),this.colors());
+    };
+}
+//every triangle has three vertices, 
+//and each vertex has three coordinates x,y and z
+//thus, the triangle will need 9 coordinates all together
+//for example [0,0,-1,1,1,-1,1,-1,-1]
+//the triangle function also takes colors: red, green, blue 
+//from a value of 0 to 1
+//if you uncomment the following two lines of code
+//you should see a triangle (be sure to turn the tick function off down below)
+// 
+//var tri = new triangle([0,0,-1,1,1,-1,1,-1,-1],0,0,1);
+//tri.render();
 //
-//this is the basic building block of the maze, it's a cube.
-//3D graphics use triangles to render graphics
-//one needs a lot of triangles to make a cube
-function cube(x,y,z,height,width,depth,red,green,blue){
+//you will notice that the render function is calling glRender 
+//which is located in the html file
+//it's some pretty complicated webGL, but if you want to learn more
+//I'd suggest you check out the link
+//you should also notice that the colors takes a fourth value... no idea what that's about   
+//
+//following we have our basic shapes
+//all we have is a box and a pyramid for now
+//but hopefully we can all work together to make some other shapes
+
+function box(x,y,z,height,width,depth,r,g,b){
     this.vertices = function(){
         return [[x,y,z,x+width,y,z,x,y+height,z],[x+width,y,z,x,y+height,z,x+width,y+height,z],[x,y,z,x+width,y,z,x,y,z+depth],[x+width,y,z,x,y,z+depth,x+width,y,z+depth],[x+width,y,z+depth,x+width,y+height,z+depth,x,y+height,z+depth],[x+width,y,z+depth,x,y,z+depth,x,y+height,z+depth],[x+width,y+height,z+depth,x,y+height,z+depth,x,y+height,z],[x+width,y+height,z+depth,x,y+height,z,x+width,y+height,z],[x+width,y+height,z+depth,x+width,y,z+depth,x+width,y+height,z],[x+width,y,z,x+width,y,z+depth,x+width,y+height,z],[x,y+height,z+depth,x,y,z+depth,x,y+height,z],[x,y,z,x,y,z+depth,x,y+height,z]];
+        //,[x,y+height,z+depth,x,y,z+depth,x,y+height,z],[x+1,y,z,x,y,z+depth,x,y+height,z]
     };
     this.colors = function(){
         var colors = [];
         for(var i = 0; i<12;i++){
-            colors.push([red,green,blue]);
+            colors.push([r,g,b,1,r,g,b,1,r,g,b,0.1]);
         }
         return colors;
     };
+    this.render = function(){
+        glRender(this.vertices(),this.colors());
+    };
 }
 
+function pyramid(x,y,z,height,angle,r,g,b){
+    var base = height*Math.tan(angle);
+    this.vertices = function(){
+        return [[x,y,z,x+base,y-height,z+base,x+base,y-height,z-base],[x,y,z,x-base,y-height,z+base,x-base,y-height,z-base],[x,y,z,x-base,y-height,z+base,x+base,y-height,z+base],[x,y,z,x-base,y-height,z-base,x+base,y-height,z-base]];
+    };
+    this.colors = function(){
+        var colors = [];
+        for(var i = 0; i<4;i++){
+            colors.push([r,g,b,1,r,g,b,1,r,g,b,0.1]);
+        }
+        return colors;
+    };
+    this.render = function(){
+        glRender(this.vertices(),this.colors());
+    };
+}
+//next up we have rotation and transpose
+//I hope they are fairly obvious, even though they may be a little complicated
+//the one thing to point out is that we use the add method to tell the object what to rotate
+//continuing from the triangle example:
+//var rot = new rotation(Math.PI/6,0,0);
+//rot.add(tri);
+//rot.render();
 
-//here's the scene function
-//this is where it all comes together  
-//you can chain multiple scenes together to get some truly cool results
-  
-function scene(x,y,z,angleX,angleY,angleZ){
-    var vertices = [];
+
+function rotation(angleX,angleY,angleZ){
+    var array = [];
     var colors = [];
     this.add = function(obj){
         for(var i = 0 ; i< obj.vertices().length;i++){
             var temp = [];
             for(var j = 0; j<8; j=j+3){
-                var x_ = (obj.vertices()[i][j]+x)*Math.cos(angleZ)*Math.cos(angleY)-(obj.vertices()[i][j+1]+y)*Math.sin(angleZ)*Math.cos(angleY)+(obj.vertices()[i][j+2]+z)*Math.sin(angleY);
-               var y_ = (obj.vertices()[i][j]+x)*(Math.sin(angleZ)*Math.cos(angleX)+Math.cos(angleZ)*Math.sin(angleY)*Math.sin(angleX)) + (obj.vertices()[i][j+1]+y)*(Math.cos(angleZ)*Math.cos(angleX)-Math.sin(angleZ)*Math.sin(angleX)*Math.sin(angleY))-(obj.vertices()[i][j+2]+z)*Math.cos(angleY)*Math.sin(angleX);
-                var z_ = (obj.vertices()[i][j]+x)*(Math.sin(angleZ)*Math.sin(angleX)-Math.cos(angleX)*Math.sin(angleY)*Math.cos(angleZ))+(obj.vertices()[i][j+1]+y)*(Math.cos(angleZ)*Math.sin(angleX)+Math.cos(angleX)*Math.sin(angleY)*Math.sin(angleZ))+(obj.vertices()[i][j+2]+z)*Math.cos(angleY)*Math.cos(angleX);
+                var x_ = (obj.vertices()[i][j]*Math.cos(angleZ)+obj.vertices()[i][j+1]*Math.sin(angleZ))*Math.cos(angleY)+obj.vertices()[i][j+2]*Math.sin(angleY);
+               var y_ =  (obj.vertices()[i][j+1]*Math.cos(angleZ)-obj.vertices()[i][j]*Math.sin(angleZ))*Math.cos(angleX)-(obj.vertices()[i][j+2]*Math.cos(angleY)-(obj.vertices()[i][j]*Math.cos(angleZ)+obj.vertices()[i][j+1]*Math.sin(angleZ))*Math.sin(angleY))*Math.sin(angleX);
+                var z_ =  Math.sin(angleX)*(obj.vertices()[i][j+1]*Math.cos(angleZ)-obj.vertices()[i][j]*Math.sin(angleZ))+Math.cos(angleX)*(obj.vertices()[i][j+2]*Math.cos(angleY)-Math.sin(angleY)*(obj.vertices()[i][j]*Math.cos(angleZ)+obj.vertices()[i][j+1]*Math.sin(angleZ)));
                 temp.push(x_,y_,z_);
+                
             }
-        vertices.push(temp);    
+        array.push(temp);    
         colors.push(obj.colors()[i]);
-        } 
+        }   
     };
     this.vertices = function(){
+        return array;
+    };
+    this.colors = function(){
+        return colors;
+    };
+    this.render = function(){
+        glRender(array,colors);
+    };
+}
+
+function transpose(x,y,z){
+    var array = [];
+    var colors = [];
+    this.add = function(obj){
+        for(var i = 0 ; i< obj.vertices().length;i++){
+        array.push(
+            [obj.vertices()[i][0]+x,obj.vertices()[i][1]+y,obj.vertices()[i][2]+z,
+            obj.vertices()[i][3]+x,obj.vertices()[i][4]+y,obj.vertices()[i][5]+z,
+            obj.vertices()[i][6]+x,obj.vertices()[i][7]+y,obj.vertices()[i][8]+z]
+                );
+        colors.push(obj.colors()[i]);
+        }        
+    };
+    this.vertices = function(){
+        return array;
+    };
+    this.colors = function(){
+        return colors;
+    };
+    this.render = function(){
+        glRender(array,colors);
+    };
+}
+
+//here's the scene function
+//this is where it all comes together  
+//you will find that you will get the best results by chaining multiple scenes together
+//for example, adding scene1 and scene2 to scene3 and then adding more stuff
+//to scene3 before adding it to scene4
+//it can get pretty cool  
+
+function scene(x,y,z,angleX,angleY,angleZ){
+    var vertices = [];
+    var colors = [];
+    this.add = function(obj){
+        var tempTrans = new transpose(x,y,z);
+        tempTrans.add(obj);
+        var tempRotate = new rotation(angleX,angleY,angleZ);
+        tempRotate.add(tempTrans);
+        for(var i = 0 ; i< obj.vertices().length;i++){
+            vertices.push(tempRotate.vertices()[i]);
+            colors.push(obj.colors()[i]);
+        }
+    };
+    this.vertices = function(){
+        
         return vertices;
     };
     this.colors = function(){
         return colors;
     };
     this.render = function(){
-      	//here we call on glRender
-      	//this is located in the html file
-      	//It's some pretty complicated stuff
-      	//and it doesn't even use javascript
-      	//so I decide to hide it away
         glRender(vertices,colors);
     };
 }
   
-//to make a maze, we should first go into "developer mode"
-//change z to 0, y to -30, and angleX to 1/2*Math.PI
-var player = {
-    x: 0,
-    y: 0,
-    z: -30,
-    angleX:0,
-    angleY:0,
-    angleZ:0
-};
-//you'll have to press run to see your changes
-//now that we can see exactly what's going on
-//I highly recommend getting out a pen and paper
-//and draw by hand the maze you wish to build
-//then skip down to the maze function below and implement your drawing
-//after the walls are in place, take yourself out of "developer mode" and check where the walls meet.
-//when walls overlap, some weird effects creep in, so you'll have to do some fine tuning
-//happy coding :)
+//finally we're ready to program our scene
+//I assume this is all fairly self evident
 
-function horizontalWall(x,z,length){
-    var wall = new cube(x,-1,z,2,1,length,1,1,0);
-    world.add(wall);
+function tree(x,z){
+    var greenBox = new box(-0.4+x,1,-0.4-z,1.3,1.8,1.8,0.5,1,0);
+    var trunk = new box(x,-1,-z,2,1,1,0.7,0.5,0.2);
+    scene1.add(greenBox);
+    scene1.add(trunk);
 }
-function verticalWall(x,z,length){
-    var wall = new cube(x,-1,z,2,length,1,0.5,0.9,0);
-    world.add(wall);
+function sand(x,z){
+    var yellowBox = new box(x-3,-2,-z-4,0.5,18,18,1,1,0);
+    scene1.add(yellowBox);
 }
-function maze(){
-    //inside
-    
-    horizontalWall(5,5,-10);
-    horizontalWall(-6,5,-10);
-    verticalWall(-5,4,10);
-    verticalWall(-5,-5,3);
-    verticalWall(2,-5,3);
-    
-    //2nd ring
-    verticalWall(-10,-10,8);
-    verticalWall(2,-10,8);
-    verticalWall(-10,10,20);
-    horizontalWall(-11,-10,10);
-    horizontalWall(10,-10,10);
-    horizontalWall(-11,5,6);
-    horizontalWall(10,5,6);
-    
-    
-    //outer wall
-    verticalWall(-15,-15,30);
-    verticalWall(-15,15,13);
-    verticalWall(2,15,13);
-    horizontalWall(-16,-15,31);
-    horizontalWall(15,-15,31);
-    
-    //roadblocks
-    horizontalWall(2,-5,-4);
-    horizontalWall(-3,-5,-4);
-    verticalWall(-15,5,4);
+function lake(x,z,ripples){
+    var blueBox = new box(x,-1.5,-z,0.3,4,4,0,0.1,1);
+    var ripple = new box(x,-1.4,-z+ripples,0.3,4,1/10,0,0.7,1);
+    var rotLake = new rotation(0,3/4*Math.PI,0);
+    rotLake.add(blueBox);
+    rotLake.add(ripple);
+    scene1.add(rotLake);
+}
+function bird(x,z){
+    var birdTemp = new box(x,3,-z,0.5,1,1,1,0.5,0);
+    scene1.add(birdTemp);
 }
 
-function goal(ticker){
-    var tower = new cube(-2,-1,-1,9,3,3,0.2,0.2,0.6);
-    var floater = new cube(-6,6,-1,1,1,1,1,0.1,0.7);
-   
-    var rotate1 = new scene(1,0,-1,0,ticker/8,0);
-    var rotate2 = new scene(1,0,-1,0,-ticker,0);
-    var rotate3 = new scene(1,0,-1,0,-ticker+2,0);
-    var rotate4 = new scene(1,0,-1,0,-ticker+4,0);
-    rotate1.add(tower);
-    rotate2.add(floater);
-    rotate3.add(floater);
-    rotate4.add(floater);
-
-    world.add(rotate1);
-    world.add(rotate2);
-    world.add(rotate3);
-    world.add(rotate4);
+function mountain(x,z){
+    var mountain1 = new pyramid(0,6,0,9,Math.PI/8,0.2,0.2,0.6);
+    var peak = new pyramid(0,6.1,0,2,Math.PI/8,0.7,0.8,0.8);
+    var rotMountain = new rotation(0,1/4*Math.PI,0);
+    rotMountain.add(mountain1);
+    rotMountain.add(peak);
+    var transpose1 = new transpose(x,0,z);
+    transpose1.add(rotMountain);
+    scene1.add(transpose1);
 }
-
-
-//this is the eventlistener, so that we can move the player 
-var keys = [];
-window.addEventListener("keydown", function (e) {
-  keys[e.keyCode] = true;
-});
-window.addEventListener("keyup", function (e) {
-  keys[e.keyCode] = false;
-});
-
-//and here is where we finally animate the world
+//here we get ready to animate stuff
 
 var ticker = 0;
+var rippleTicker = 0; 
+var animateTicker = 0;
+
+  
+  
+//
+//
+//
+//
 function tick(){
+  
+    scene1 = new scene(0,0,0,1/4*Math.PI,0,0*ticker);
+    camera = new scene(0,0,-5-animateTicker,animateTicker/3,0,0);
     
-    if (keys[37]){player.angleY -= 0.05;}
-    if (keys[39]){player.angleY += 0.05;}
-    if (keys[40]) {
-        player.x += 0.15*Math.sin(player.angleY);
-        player.z -= 0.15*Math.cos(player.angleY);
+    bird(-2*ticker+5,4);
+    tree(3,1);
+    tree(1,3);
+    tree(2,4);
+    tree(4,3);
+    sand(-4,8);
+    lake(-1,4,rippleTicker);
+    lake(3,2,rippleTicker); 
+    lake(3,6,rippleTicker);
+    mountain(0,-14);   
+    mountain(6,-12);
+    mountain(-5,-15);
+    
+    camera.add(scene1);
+    if (ticker<4*Math.PI){ticker = ticker +0.05;}
+    else{ticker = 0;}
+    if (rippleTicker<4){rippleTicker += 0.03;}
+    else{rippleTicker = 0;}
+    if(animateTicker>-3){
+        animateTicker -= 0.01;  
     }
-    if (keys[38]) {
-        player.x -= 0.15*Math.sin(player.angleY);
-        player.z += 0.15*Math.cos(player.angleY);
-    }
-   
-    world = new scene(player.x, player.y, player.z, player.angleX, player.angleY, player.angleZ);
-    
-   ticker += 0.1;
-    
-    maze();
-    goal(ticker);
-    
-    world.render();
-    //for stability reasons, requestAnimation is in the html
-  	//with that said, if the graphics start to lag, you should save your world and then refresh the page
+    camera.render();
+    //this requests another function in the html
     request = requestAnimFrame(function(){tick();});
     
 }
-//and finally we call tick to start the animation
+//and finally we call tick
 tick();
+
   </textarea>
   <script>
     var myCodeMirror = CodeMirror.fromTextArea(code,{
