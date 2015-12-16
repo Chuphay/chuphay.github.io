@@ -102,34 +102,22 @@ Password<input type="password" name="pswrd"/>
   </table>
 
    <textarea id="code" cols="60" rows="30">
-//Making your own maze is easy
-//Scroll down to line 61 and follow the directions there
-//
-//
-//
-//
-//
-//this is the basic building block of the maze, it's a cube.
-//3D graphics use triangles to render graphics
-//one needs a lot of triangles to make a cube
-function cube(x,y,z,height,width,depth,red,green,blue){
-    this.vertices = function(){
-        return [[x,y,z,x+width,y,z,x,y+height,z],[x+width,y,z,x,y+height,z,x+width,y+height,z],[x,y,z,x+width,y,z,x,y,z+depth],[x+width,y,z,x,y,z+depth,x+width,y,z+depth],[x+width,y,z+depth,x+width,y+height,z+depth,x,y+height,z+depth],[x+width,y,z+depth,x,y,z+depth,x,y+height,z+depth],[x+width,y+height,z+depth,x,y+height,z+depth,x,y+height,z],[x+width,y+height,z+depth,x,y+height,z,x+width,y+height,z],[x+width,y+height,z+depth,x+width,y,z+depth,x+width,y+height,z],[x+width,y,z,x+width,y,z+depth,x+width,y+height,z],[x,y+height,z+depth,x,y,z+depth,x,y+height,z],[x,y,z,x,y,z+depth,x,y+height,z]];
-    };
+
+function line(xStart, yStart, zStart, xStart_, yStart_, zStart_, xEnd, yEnd, zEnd, xEnd_, yEnd_, zEnd_, red, green, blue){
+  	this.vertices = function(){
+    	return[[xStart,yStart,zStart,  xStart_, yStart_, zStart_, xEnd, yEnd, zEnd],[xEnd,yEnd,zEnd,  xStart_, yStart_, zStart_, xEnd_, yEnd_, zEnd_]];
+    }
     this.colors = function(){
-        var colors = [];
-        for(var i = 0; i<12;i++){
-            colors.push([red,green,blue]);
-        }
-        return colors;
+      
+        return [[red,green,blue],[red,green,blue]];
+    }
+    this.render = function(){
+      	
+        glRender(this.vertices(),this.colors());
     };
 }
 
-
-//here's the scene function
-//this is where it all comes together  
-//you can chain multiple scenes together to get some truly cool results
-  
+ 
 function scene(x,y,z,angleX,angleY,angleZ){
     var vertices = [];
     var colors = [];
@@ -153,93 +141,27 @@ function scene(x,y,z,angleX,angleY,angleZ){
         return colors;
     };
     this.render = function(){
-      	//here we call on glRender
-      	//this is located in the html file
-      	//It's some pretty complicated stuff
-      	//and it doesn't even use javascript
-      	//so I decide to hide it away
+   
         glRender(vertices,colors);
     };
 }
-  
-//to make a maze, we should first go into "developer mode"
-//change z to 0, y to -30, and angleX to 1/2*Math.PI
+ 
+
 var player = {
-    x: 0,
+    x: 5,
     y: 0,
-    z: -30,
-    angleX:0,
-    angleY:0,
+    z: -3,
+    angleX:0*1/2*Math.PI,
+    angleY:1/4*Math.PI,
     angleZ:0
 };
-//you'll have to press run to see your changes
-//now that we can see exactly what's going on
-//I highly recommend getting out a pen and paper
-//and draw by hand the maze you wish to build
-//then skip down to the maze function below and implement your drawing
-//after the walls are in place, take yourself out of "developer mode" and check where the walls meet.
-//when walls overlap, some weird effects creep in, so you'll have to do some fine tuning
-//happy coding :)
-
-function horizontalWall(x,z,length){
-    var wall = new cube(x,-1,z,2,1,length,1,1,0);
-    world.add(wall);
+function sin(time){
+  for(var i =-12;i<12.6;i++){
+  	lineTest = new line(i,Math.sin(i+time),0, i,Math.sin(i+time),-1, i+1,Math.sin(i+1+time),0, i+1,Math.sin(i+1+time),-1, (i+12)/24,0,1);
+	world.add(lineTest);
+  }
+  	
 }
-function verticalWall(x,z,length){
-    var wall = new cube(x,-1,z,2,length,1,0.5,0.9,0);
-    world.add(wall);
-}
-function maze(){
-    //inside
-    
-    horizontalWall(5,5,-10);
-    horizontalWall(-6,5,-10);
-    verticalWall(-5,4,10);
-    verticalWall(-5,-5,3);
-    verticalWall(2,-5,3);
-    
-    //2nd ring
-    verticalWall(-10,-10,8);
-    verticalWall(2,-10,8);
-    verticalWall(-10,10,20);
-    horizontalWall(-11,-10,10);
-    horizontalWall(10,-10,10);
-    horizontalWall(-11,5,6);
-    horizontalWall(10,5,6);
-    
-    
-    //outer wall
-    verticalWall(-15,-15,30);
-    verticalWall(-15,15,13);
-    verticalWall(2,15,13);
-    horizontalWall(-16,-15,31);
-    horizontalWall(15,-15,31);
-    
-    //roadblocks
-    horizontalWall(2,-5,-4);
-    horizontalWall(-3,-5,-4);
-    verticalWall(-15,5,4);
-}
-
-function goal(ticker){
-    var tower = new cube(-2,-1,-1,9,3,3,0.2,0.2,0.6);
-    var floater = new cube(-6,6,-1,1,1,1,1,0.1,0.7);
-   
-    var rotate1 = new scene(1,0,-1,0,ticker/8,0);
-    var rotate2 = new scene(1,0,-1,0,-ticker,0);
-    var rotate3 = new scene(1,0,-1,0,-ticker+2,0);
-    var rotate4 = new scene(1,0,-1,0,-ticker+4,0);
-    rotate1.add(tower);
-    rotate2.add(floater);
-    rotate3.add(floater);
-    rotate4.add(floater);
-
-    world.add(rotate1);
-    world.add(rotate2);
-    world.add(rotate3);
-    world.add(rotate4);
-}
-
 
 //this is the eventlistener, so that we can move the player 
 var keys = [];
@@ -255,7 +177,7 @@ window.addEventListener("keyup", function (e) {
 var ticker = 0;
 function tick(){
     
-    if (keys[37]){player.angleY -= 0.05;}
+     if (keys[37]){player.angleY -= 0.05;}
     if (keys[39]){player.angleY += 0.05;}
     if (keys[40]) {
         player.x += 0.15*Math.sin(player.angleY);
@@ -265,13 +187,11 @@ function tick(){
         player.x -= 0.15*Math.sin(player.angleY);
         player.z += 0.15*Math.cos(player.angleY);
     }
+     
    
     world = new scene(player.x, player.y, player.z, player.angleX, player.angleY, player.angleZ);
-    
    ticker += 0.1;
-    
-    maze();
-    goal(ticker);
+    sin(ticker);
     
     world.render();
     //for stability reasons, requestAnimation is in the html
