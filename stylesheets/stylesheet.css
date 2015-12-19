@@ -25,11 +25,10 @@ canvas {
   display:table-row;
   margin:auto;
   margin-top:7%;
-  width:33%;
+  width:100%;
   text-align:center;
   padding:0 1px 0 1px;
   color:lightgrey;
-  width:800px;
 }
 
 h3 {
