@@ -5,6 +5,20 @@
 <title>[]</title>
 </head>
 <body>
+  <p>
+    SELECT (Month=1) + (DayofMonth=24) + (DayofWeek=2) + 
+(abs(CRSDepTime - 1850) < 20) + (abs(CRSElapsedTime - 46) < 20) +
+(UniqueCarrier = "NW") + (FlightNum = 347) + (Origin = "MBS") + (Dest = "DTW") 
+as Similarity, DepDelay, ArrDelay FROM ontime ORDER BY Similarity DESC LIMIT 15;
+    
+  </p>
+  <p>
+    
+    
+  </p>
+  
+  
+  
   <table border="1">
 <tr>
 <td>Year</td>
