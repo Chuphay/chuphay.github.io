@@ -5,29 +5,32 @@
 <title>[]</title>
 </head>
 <body>
+  <div style="border:1px solid black;background-color: lightblue;">
   <p>
     SELECT (Month=1) + (DayofMonth=24) + (DayofWeek=2) + 
 (abs(CRSDepTime - 1850) < 20) + (abs(CRSElapsedTime - 46) < 20) +
 (UniqueCarrier = "NW") + (FlightNum = 347) + (Origin = "MBS") + (Dest = "DTW") 
 as Similarity, DepDelay, ArrDelay FROM ontime ORDER BY Similarity DESC LIMIT 15;
     
-  </p>
-  <p>
-    
-    
-  </p>
+  </p><br>  </div>
+
+  <div style="border:1px solid black;background-color: lightblue;">
   <p>
     SELECT 0.4*(Month=1) + 1.3*(DayofMonth=24) + 0.7*(DayofWeek=2) + 
 2.1*(abs(CRSDepTime - 1850) < 20) + 1.6*(abs(CRSElapsedTime - 46) < 20) +
 1.5*(UniqueCarrier = "NW") + 0.4*(FlightNum = 347) + 1.9*(Origin = "MBS") + 1.7*(Dest = "DTW") 
 as Similarity, DepDelay, ArrDelay FROM ontime ORDER BY Similarity DESC LIMIT 15;
-  </p>
+  </p><br>  </div>
+  
+  <div style="border:1px solid black;background-color: lightblue;">
   <p>
     CREATE VIEW flt347 AS SELECT 0.4*(Month=1) + 1.3*(DayofMonth=24) + 0.7*(DayofWeek=2) + 
 2.1*(abs(CRSDepTime - 1850) < 20) + 1.6*(abs(CRSElapsedTime - 46) < 20) +
 1.5*(UniqueCarrier = "NW") + 0.4*(FlightNum = 347) + 1.9*(Origin = "MBS") + 1.7*(Dest = "DTW") 
 as Similarity, DepDelay, ArrDelay FROM ontime ORDER BY Similarity DESC LIMIT 15;
-  </p><br>
+  </p><br>  </div>
+  
+  <div style="border:1px solid black;background-color: lightblue;">
   <p>
     CREATE VIEW flt515 AS SELECT 0.4*(Month=3) + 1.3*(DayofMonth=23) + 0.7*(DayofWeek=4) + 
 2.1*(abs(CRSDepTime - 955) < 20) + 1.6*(abs(CRSElapsedTime - 155) < 20) +
@@ -36,7 +39,7 @@ as Similarity, DepDelay, ArrDelay FROM ontime ORDER BY Similarity DESC LIMIT 15;
     
   </p><br>
   
-  
+  </div>
   
   <table border="1">
 <tr>
